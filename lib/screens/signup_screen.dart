@@ -113,50 +113,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   Expanded(
                     flex: 1,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/background_signup.png'),
-                          fit: BoxFit.cover,
+                    child: Stack(
+                      children: [
+                        // Imagem de fundo da personagem
+                        Positioned(
+                          right:
+                              -100, // Ajuste este valor para mover a imagem para a esquerda
+                          top: 0,
+                          bottom: 0,
+                          child: Image.asset(
+                            'assets/background_signup.png',
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(48.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'assets/erank_logo.png',
-                              height: 200,
-                            ),
-                            const Spacer(),
-                            Text(
-                              'CRIAR UMA\nCONTA',
-                              style: GoogleFonts.exo2(
-                                fontSize: 64,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                height: 1.0,
+                        // Conteúdo da esquerda (Logo e texto "CRIAR UMA CONTA")
+                        Padding(
+                          padding: const EdgeInsets.all(48.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.asset(
+                                'assets/erank_logo.png',
+                                height: 200,
                               ),
-                            ),
-                            const Spacer(),
-                          ],
+                              const Spacer(),
+                              Text(
+                                'CRIAR UMA\nCONTA',
+                                style: GoogleFonts.exo2(
+                                  fontSize: 64,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.0,
+                                ),
+                              ),
+                              const Spacer(),
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                   Expanded(
                     flex: 1,
                     child: Container(
-                      // AQUI ESTÁ A MUDANÇA
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          // Usando a sua nova imagem de fundo
-                          image: AssetImage('assets/background_signup2.png'),
-                          fit: BoxFit
-                              .cover, // Garante que a imagem cubra o painel
-                        ),
-                      ),
+                      color: const Color(0xFF1A1A2E), // Cor de fundo sólida
                       child: Center(
                         child: _buildSignUpForm(),
                       ),
