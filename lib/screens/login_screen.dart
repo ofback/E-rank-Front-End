@@ -144,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               children: [
                                 Image.asset(
                                   'assets/erank_logo.png',
-                                  height: 200,
+                                  height: 300,
                                 ),
                                 const Spacer(),
                                 Text(

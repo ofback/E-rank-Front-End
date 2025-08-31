@@ -103,7 +103,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen = screenWidth > 800;
+    final isLargeScreen =
+        screenWidth > 960; // Aumentei o breakpoint para dar mais espaço
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
@@ -111,46 +112,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: isLargeScreen
             ? Row(
                 children: [
+                  // --- PAINEL DA ESQUERDA CORRIGIDO ---
                   Expanded(
                     flex: 1,
-                    child: Stack(
-                      children: [
-                        // Imagem de fundo da personagem
-                        Positioned(
-                          right:
-                              -100, // Ajuste este valor para mover a imagem para a esquerda
-                          top: 0,
-                          bottom: 0,
-                          child: Image.asset(
-                            'assets/background_signup.png',
-                            fit: BoxFit.cover,
-                          ),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/background_signup.png'),
+                          // ALINHAMENTO DA IMAGEM É A CHAVE DA CORREÇÃO
+                          // Alinha a imagem pela esquerda, garantindo que a arma sempre apareça.
+                          alignment: Alignment.centerLeft,
+                          fit: BoxFit.cover,
                         ),
-                        // Conteúdo da esquerda (Logo e texto "CRIAR UMA CONTA")
-                        Padding(
-                          padding: const EdgeInsets.all(48.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Image.asset(
-                                'assets/erank_logo.png',
-                                height: 200,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(48.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/erank_logo.png',
+                              height: 220,
+                            ),
+                            const Spacer(),
+                            Text(
+                              'CRIAR UMA\nCONTA',
+                              style: GoogleFonts.exo2(
+                                fontSize: 64,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                height: 1.0,
                               ),
-                              const Spacer(),
-                              Text(
-                                'CRIAR UMA\nCONTA',
-                                style: GoogleFonts.exo2(
-                                  fontSize: 64,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.0,
-                                ),
-                              ),
-                              const Spacer(),
-                            ],
-                          ),
+                            ),
+                            const Spacer(),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                   Expanded(
@@ -174,7 +171,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 750),
+        constraints: const BoxConstraints(
+            maxWidth: 550), // Diminuí um pouco para dar mais espaço à imagem
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -211,18 +209,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // TODOS OS CAMPOS E VALIDAÇÕES ESTÃO DE VOLTA AQUI
+                // ... (O restante do seu formulário, que já está correto, vem aqui)
                 TextFormField(
                   controller: _nicknameController,
                   decoration: _buildInputDecoration('NICKNAME',
                       isWhiteBackground: true),
                   style: const TextStyle(color: Colors.black87),
                   validator:
-                      RequiredValidator(errorText: 'Nickname é obrigatório')
-                          .call,
+                      RequiredValidator(errorText: 'Nickname é obrigatório'),
                 ),
                 const SizedBox(height: 20),
-
                 TextFormField(
                   controller: _emailController,
                   decoration:
@@ -232,10 +228,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   validator: MultiValidator([
                     RequiredValidator(errorText: 'E-mail é obrigatório'),
                     EmailValidator(errorText: 'Insira um e-mail válido')
-                  ]).call,
+                  ]),
                 ),
                 const SizedBox(height: 20),
-
                 TextFormField(
                   controller: _confirmEmailController,
                   decoration: _buildInputDecoration('CONFIRME O E-MAIL',
@@ -247,7 +242,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           .validateMatch(val!, _emailController.text),
                 ),
                 const SizedBox(height: 20),
-
                 TextFormField(
                   controller: _cpfController,
                   decoration:
@@ -264,7 +258,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
                 TextFormField(
                   controller: _phoneController,
                   decoration: _buildInputDecoration('TELEFONE',
@@ -281,7 +274,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
@@ -294,10 +286,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         errorText: 'A senha deve ter no mínimo 8 caracteres'),
                     MaxLengthValidator(20,
                         errorText: 'A senha deve ter no máximo 20 caracteres')
-                  ]).call,
+                  ]),
                 ),
                 const SizedBox(height: 20),
-
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: true,
@@ -309,7 +300,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           .validateMatch(val!, _passwordController.text),
                 ),
                 const SizedBox(height: 10),
-
                 CheckboxListTile(
                   title: Text(
                     'Sim, permito o envio de informações e eventos.',
@@ -327,7 +317,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 30),
-
                 SizedBox(
                   height: 60,
                   child: ElevatedButton(
@@ -351,7 +340,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-
                 TextButton(
                   onPressed: () {
                     Navigator.pushReplacement(
