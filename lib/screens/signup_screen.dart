@@ -4,7 +4,8 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:erank_app/screens/login_screen.dart';
 import 'package:erank_app/services/auth_service.dart';
-import 'package:erank_app/widgets/custom_form_field.dart'; // Importação adicionada
+import 'package:erank_app/widgets/custom_form_field.dart';
+import 'package:erank_app/core/theme/app_colors.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -64,7 +65,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.green,
             content: Text('Usuário cadastrado com sucesso! Faça o login.')),
       );
       Navigator.pushReplacement(context,
@@ -72,7 +73,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.red,
             content: Text('Erro ao cadastrar. O e-mail já pode existir.')),
       );
     }
@@ -84,7 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final isLargeScreen = screenWidth > 800;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: isLargeScreen
             ? Row(
@@ -108,7 +109,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Text('CRIAR UMA\nCONTA',
                                 style: GoogleFonts.exo2(
                                     fontSize: 64,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     fontWeight: FontWeight.bold,
                                     height: 1.0)),
                             const Spacer(),
@@ -143,7 +144,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         constraints: const BoxConstraints(maxWidth: 750),
         child: Container(
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
@@ -160,12 +161,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Text('Comece sua jornada',
                       style: GoogleFonts.poppins(
                           fontSize: 24,
-                          color: Colors.black87,
+                          color: AppColors.black87,
                           fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   Text('Preencha seus dados para entrar no ranking.',
                       style: GoogleFonts.poppins(
-                          fontSize: 14, color: Colors.grey)),
+                          fontSize: 14, color: AppColors.grey)),
                   const SizedBox(height: 30),
                   CustomFormField(
                     controller: _nicknameController,
@@ -247,7 +248,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     value: _acceptMarketing,
                     onChanged: (v) => setState(() => _acceptMarketing = v!),
                     controlAffinity: ListTileControlAffinity.leading,
-                    activeColor: const Color(0xFF7F5AF0),
+                    activeColor: AppColors.primary,
                     contentPadding: EdgeInsets.zero,
                   ),
                   const SizedBox(height: 30),
@@ -256,19 +257,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _registerUser,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7F5AF0),
+                        backgroundColor: AppColors.primary,
                         shape: const CircleBorder(),
                         padding: EdgeInsets.zero,
-                        disabledBackgroundColor: Colors.grey.shade400,
+                        disabledBackgroundColor: AppColors.greyShade400,
                       ),
                       child: _isLoading
                           ? const SizedBox(
                               width: 30,
                               height: 30,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 3, color: Colors.white))
+                                  strokeWidth: 3, color: AppColors.white))
                           : const Icon(Icons.arrow_forward_ios,
-                              color: Colors.white, size: 28),
+                              color: AppColors.white, size: 28),
                     ),
                   ),
                   const SizedBox(height: 30),
