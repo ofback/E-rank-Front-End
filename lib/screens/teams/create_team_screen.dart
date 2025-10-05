@@ -5,6 +5,7 @@ import 'package:erank_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:erank_app/services/team_service.dart';
 
 class CreateTeamScreen extends StatefulWidget {
   const CreateTeamScreen({super.key});
@@ -37,14 +38,42 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
     super.dispose();
   }
 
-  void _createTeam() {
+  Future<void> _createTeam() async {
+    // Transforme em async
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    // Lógica para chamar o serviço com os amigos selecionados virá aqui
-    print('Nome do Time: ${_teamNameController.text}');
-    print('Descrição: ${_descriptionController.text}');
-    print('IDs dos Amigos Selecionados: $_selectedFriendIds');
+
+    setState(() => _isLoading = true);
+
+    // Chama o serviço com todas as informações necessárias
+    final success = await TeamService.createTeam(
+      name: _teamNameController.text,
+      description: _descriptionController.text,
+      memberIds: _selectedFriendIds.toList(), // Converte o Set para uma List
+    );
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppColors.green,
+          content: Text('Time criado e convites enviados com sucesso!'),
+        ),
+      );
+      // Volta para a tela de perfil
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppColors.red,
+          content: Text('Erro ao criar o time. Tente novamente.'),
+        ),
+      );
+    }
   }
 
   @override
