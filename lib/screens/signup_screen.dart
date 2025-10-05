@@ -175,6 +175,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget _buildSignUpForm() {
+    // Determina o número de colunas com base na largura da tela
+    final screenWidth = MediaQuery.of(context).size.width;
+    final crossAxisCount =
+        screenWidth > 750 ? 2 : 1; // 2 colunas se a tela for larga
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
       child: ConstrainedBox(
@@ -206,88 +211,69 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fontSize: 14, color: AppColors.grey)),
                   const SizedBox(height: 30),
 
-                  // --- NOVO LAYOUT EM LINHAS ---
-                  Row(
+                  // --- NOVO LAYOUT COM GRIDVIEW ---
+                  GridView.count(
+                    crossAxisCount: crossAxisCount,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisSpacing: 20,
+                    mainAxisSpacing: 20,
+                    childAspectRatio:
+                        4, // Ajuste este valor para mudar a altura dos campos
                     children: [
-                      Expanded(
-                        child: CustomFormField(
-                          controller: _nicknameController,
-                          label: 'NICKNAME', // Usando label de volta
-                          validator: RequiredValidator(
-                                  errorText: 'Nickname é obrigatório')
-                              .call,
-                        ),
+                      CustomFormField(
+                        controller: _nicknameController,
+                        label: 'NICKNAME',
+                        validator: RequiredValidator(
+                                errorText: 'Nickname é obrigatório')
+                            .call,
                       ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: CustomFormField(
-                          controller: _cpfController,
-                          label: 'CPF',
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [_cpfMask],
-                          validator: (val) {
-                            if (val == null || val.isEmpty)
-                              return 'CPF é obrigatório';
-                            if (val.length != 14) return 'CPF inválido';
-                            return null;
-                          },
-                        ),
+                      CustomFormField(
+                        controller: _cpfController,
+                        label: 'CPF',
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [_cpfMask],
+                        validator: (val) {
+                          if (val == null || val.isEmpty)
+                            return 'CPF é obrigatório';
+                          if (val.length != 14) return 'CPF inválido';
+                          return null;
+                        },
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomFormField(
-                          controller: _emailController,
-                          label: 'E-MAIL',
-                          keyboardType: TextInputType.emailAddress,
-                          validator: MultiValidator([
-                            RequiredValidator(
-                                errorText: 'E-mail é obrigatório'),
-                            EmailValidator(errorText: 'Insira um e-mail válido')
-                          ]).call,
-                        ),
+                      CustomFormField(
+                        controller: _emailController,
+                        label: 'E-MAIL',
+                        keyboardType: TextInputType.emailAddress,
+                        validator: MultiValidator([
+                          RequiredValidator(errorText: 'E-mail é obrigatório'),
+                          EmailValidator(errorText: 'Insira um e-mail válido')
+                        ]).call,
                       ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: CustomFormField(
-                          controller: _confirmEmailController,
-                          label: 'CONFIRME O E-MAIL',
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (val) => MatchValidator(
-                                  errorText: 'Os e-mails não são iguais')
-                              .validateMatch(val!, _emailController.text),
-                        ),
+                      CustomFormField(
+                        controller: _confirmEmailController,
+                        label: 'CONFIRME O E-MAIL',
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (val) => MatchValidator(
+                                errorText: 'Os e-mails não são iguais')
+                            .validateMatch(val!, _emailController.text),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomFormField(
-                          controller: _passwordController,
-                          label: 'SENHA',
-                          obscureText: true,
-                          validator: MultiValidator([
-                            RequiredValidator(errorText: 'Senha é obrigatória'),
-                            MinLengthValidator(8,
-                                errorText: 'Mínimo 8 caracteres'),
-                          ]).call,
-                        ),
+                      CustomFormField(
+                        controller: _passwordController,
+                        label: 'SENHA',
+                        obscureText: true,
+                        validator: MultiValidator([
+                          RequiredValidator(errorText: 'Senha é obrigatória'),
+                          MinLengthValidator(8,
+                              errorText: 'Mínimo 8 caracteres'),
+                        ]).call,
                       ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: CustomFormField(
-                          controller: _confirmPasswordController,
-                          label: 'CONFIRME A SENHA',
-                          obscureText: true,
-                          validator: (val) => MatchValidator(
-                                  errorText: 'Senhas não coincidem')
-                              .validateMatch(val!, _passwordController.text),
-                        ),
+                      CustomFormField(
+                        controller: _confirmPasswordController,
+                        label: 'CONFIRME A SENHA',
+                        obscureText: true,
+                        validator: (val) =>
+                            MatchValidator(errorText: 'Senhas não coincidem')
+                                .validateMatch(val!, _passwordController.text),
                       ),
                     ],
                   ),

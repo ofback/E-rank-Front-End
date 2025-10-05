@@ -38,14 +38,12 @@ class _CustomFormFieldState extends State<CustomFormField> {
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
       decoration: InputDecoration(
-        hintText: widget.label, // ALTERADO DE labelText
-        hintStyle: TextStyle(
-          // ALTERADO DE labelStyle
-          color: isDarkMode ? AppColors.white54 : AppColors.greyShade600,
+        labelText: widget.label,
+        labelStyle: const TextStyle(
+          color: AppColors.greyShade600, // Usar uma cor consistente
         ),
         filled: true,
-        fillColor:
-            isDarkMode ? Colors.white.withOpacity(0.1) : AppColors.greyShade100,
+        fillColor: Colors.grey.shade100, // Um cinza claro padrão
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide.none,
@@ -55,7 +53,6 @@ class _CustomFormFieldState extends State<CustomFormField> {
           borderSide: const BorderSide(color: AppColors.primary),
         ),
         errorStyle: const TextStyle(color: AppColors.red),
-        // ADICIONE O SUFFIXICON
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(
