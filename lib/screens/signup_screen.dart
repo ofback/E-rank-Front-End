@@ -6,6 +6,7 @@ import 'package:erank_app/screens/login_screen.dart';
 import 'package:erank_app/services/auth_service.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
+import 'package:erank_app/widgets/primary_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -59,6 +60,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     };
 
     final success = await AuthService.register(user);
+
+    if (!mounted) return;
 
     setState(() => _isLoading = false);
 
@@ -252,25 +255,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     contentPadding: EdgeInsets.zero,
                   ),
                   const SizedBox(height: 30),
-                  SizedBox(
-                    height: 60,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _registerUser,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: const CircleBorder(),
-                        padding: EdgeInsets.zero,
-                        disabledBackgroundColor: AppColors.greyShade400,
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 30,
-                              height: 30,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 3, color: AppColors.white))
-                          : const Icon(Icons.arrow_forward_ios,
-                              color: AppColors.white, size: 28),
-                    ),
+                  PrimaryButton(
+                    text: 'CADASTRAR',
+                    isLoading: _isLoading,
+                    onPressed: _registerUser,
                   ),
                   const SizedBox(height: 30),
                   TextButton(

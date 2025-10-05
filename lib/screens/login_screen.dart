@@ -6,6 +6,7 @@ import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/services/auth_service.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/screens/home_screen.dart';
+import 'package:erank_app/widgets/primary_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -37,10 +38,12 @@ class _LoginScreenState extends State<LoginScreen> {
       _passwordController.text,
     );
 
+    // Verifique se o widget ainda está na árvore de widgets antes de atualizar o estado
+    if (!mounted) return;
+
     setState(() => _isLoading = false);
 
     if (success) {
-      // Navega para a HomeScreen e remove todas as telas anteriores da pilha.
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
         (Route<dynamic> route) => false,
@@ -97,25 +100,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               .call,
                     ),
                     const SizedBox(height: 40),
-                    const SizedBox(height: 40),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _loginUser,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        disabledBackgroundColor: AppColors.greyShade600,
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 3, color: AppColors.white))
-                          : Text('LOGIN',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 16, color: Colors.white)),
+                    PrimaryButton(
+                      text: 'LOGIN',
+                      isLoading: _isLoading,
+                      onPressed: _loginUser,
                     ),
                     const SizedBox(height: 20),
                     TextButton(
