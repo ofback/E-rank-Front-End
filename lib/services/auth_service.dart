@@ -6,6 +6,11 @@ import 'auth_storage.dart';
 class AuthService {
   // Registrar um novo usuário
   // Rota correta: POST /usuarios
+  static Future<void> logout() async {
+    // Simplesmente limpa os dados do usuário salvos no dispositivo
+    await AuthStorage.clearUserData();
+  }
+
   static Future<bool> register(Map<String, String> userData) async {
     final response = await http.post(
       Uri.parse(
