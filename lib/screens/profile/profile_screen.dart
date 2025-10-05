@@ -80,11 +80,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 PrimaryButton(
                   text: 'EDITAR PERFIL',
                   onPressed: () {
-                    Navigator.of(context).push(
+                    Navigator.of(context)
+                        .push(
                       MaterialPageRoute(
                         builder: (context) => EditProfileScreen(userData: user),
                       ),
-                    );
+                    )
+                        .then((_) {
+                      // Este código executa quando a tela de edição é fechada.
+                      // Chamar setState() força o FutureBuilder a rodar novamente.
+                      setState(() {});
+                    });
                   },
                 ),
                 const SizedBox(height: 20),
