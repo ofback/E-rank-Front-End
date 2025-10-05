@@ -1,22 +1,61 @@
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  // Por enquanto, apenas uma lista de widgets simples para cada página
+  static const List<Widget> _widgetOptions = <Widget>[
+    Center(
+      child: Text('Página de Início',
+          style: TextStyle(color: AppColors.white, fontSize: 24)),
+    ),
+    Center(
+      child: Text('Página de Perfil',
+          style: TextStyle(color: AppColors.white, fontSize: 24)),
+    ),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('E-Rank'),
         backgroundColor: AppColors.background,
         centerTitle: true,
+        automaticallyImplyLeading: false, // Remove a seta de "voltar"
       ),
-      body: const Center(
-        child: Text(
-          'Login realizado com sucesso!',
-          style: TextStyle(fontSize: 24, color: AppColors.white),
-        ),
+      body: _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Início',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.grey,
+        onTap: _onItemTapped,
+        backgroundColor: AppColors.background,
       ),
     );
   }
