@@ -5,6 +5,7 @@ import 'package:erank_app/services/auth_service.dart';
 import 'package:erank_app/services/user_service.dart';
 import 'package:erank_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
+import 'package:erank_app/screens/teams/create_team_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -95,7 +96,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 PrimaryButton(
                   text: 'CRIAR TIME',
-                  onPressed: () {/* Navegação para a nova tela virá aqui */},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const CreateTeamScreen()),
+                    );
+                  },
                 ),
                 const SizedBox(height: 20),
                 PrimaryButton(
