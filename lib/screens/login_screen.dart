@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:erank_app/screens/signup_screen.dart';
+import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/services/auth_service.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 
@@ -40,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.green,
             content: Text('Login realizado com sucesso!')),
       );
       // TODO: Navegar para a tela principal (HomeScreen) do aplicativo.
@@ -48,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.red,
             content: Text('E-mail ou senha inválidos.')),
       );
     }
@@ -57,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -75,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.exo2(
                             fontSize: 32,
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 40),
                     CustomFormField(
@@ -101,18 +102,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     ElevatedButton(
                       onPressed: _isLoading ? null : _loginUser,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7F5AF0),
+                        backgroundColor: AppColors.primary,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8)),
-                        disabledBackgroundColor: Colors.grey.shade600,
+                        disabledBackgroundColor: AppColors.greyShade600,
                       ),
                       child: _isLoading
                           ? const SizedBox(
                               width: 24,
                               height: 24,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 3, color: Colors.white))
+                                  strokeWidth: 3, color: AppColors.white))
                           : Text('LOGIN',
                               style: GoogleFonts.poppins(
                                   fontSize: 16, color: Colors.white)),
