@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:erank_app/screens/signup_screen.dart';
 import 'package:erank_app/services/auth_service.dart';
+import 'package:erank_app/widgets/custom_form_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -77,9 +78,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Colors.white,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 40),
-                    TextFormField(
+                    CustomFormField(
                       controller: _emailController,
-                      decoration: _buildInputDecoration('E-mail'),
+                      label: 'E-mail',
                       keyboardType: TextInputType.emailAddress,
                       validator: MultiValidator([
                         RequiredValidator(errorText: 'E-mail é obrigatório'),
@@ -87,14 +88,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ]).call,
                     ),
                     const SizedBox(height: 20),
-                    TextFormField(
+                    CustomFormField(
                       controller: _passwordController,
+                      label: 'Senha',
                       obscureText: true,
-                      decoration: _buildInputDecoration('Senha'),
                       validator:
                           RequiredValidator(errorText: 'Senha é obrigatória')
                               .call,
                     ),
+                    const SizedBox(height: 40),
                     const SizedBox(height: 40),
                     ElevatedButton(
                       onPressed: _isLoading ? null : _loginUser,
@@ -130,21 +132,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  InputDecoration _buildInputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(color: Colors.white54),
-      filled: true,
-      fillColor: Colors.white.withOpacity(0.1),
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF7F5AF0))),
-      errorStyle: const TextStyle(color: Colors.red),
     );
   }
 }
