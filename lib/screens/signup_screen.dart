@@ -33,6 +33,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isLoading = false;
   bool _acceptMarketing = false;
 
+  Widget _buildSmallScreenHeader() {
+    return Column(
+      children: [
+        const SizedBox(height: 40),
+        Image.asset('assets/erank_logo.png', height: 80),
+        const SizedBox(height: 20),
+        Text(
+          'Criar uma Conta',
+          style: GoogleFonts.exo2(
+            fontSize: 32,
+            color: AppColors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
   @override
   void dispose() {
     _nicknameController.dispose();
@@ -130,7 +149,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      child: Center(child: _buildSignUpForm()),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _buildSmallScreenHeader(),
+                            _buildSignUpForm(),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
