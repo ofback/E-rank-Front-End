@@ -69,4 +69,36 @@ class SocialService {
 
     return [];
   }
+
+  static Future<bool> acceptFriendRequest(int friendshipId) async {
+    final token = await AuthStorage.getToken();
+    if (token == null) return false;
+
+    final response = await http.patch(
+      // Usando o método PATCH
+      Uri.parse('${ApiConstants.baseUrl}/amizades/$friendshipId'),
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'status': 'A', // Enviando 'A' de Aceito
+      }),
+    );
+    return response.statusCode == 200; // OK
+  }
+
+  static Future<bool> declineOrRemoveFriendship(int friendshipId) async {
+    final token = await AuthStorage.getToken();
+    if (token == null) return false;
+
+    final response = await http.delete(
+      // Usando o método DELETE
+      Uri.parse('${ApiConstants.baseUrl}/amizades/$friendshipId'),
+      headers: {
+        'Authorization': token,
+      },
+    );
+    return response.statusCode == 204; // No Content
+  }
 }
