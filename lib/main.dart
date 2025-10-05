@@ -1,6 +1,7 @@
 import 'package:erank_app/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
+import 'package:erank_app/navigation/auth_wrapper.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.purple,
         primaryColor: AppColors.primary,
       ),
-      home: const SignUpScreen(), // Nossa tela de cadastro é a tela inicial
+      home: const AuthWrapper(), // Nossa tela de cadastro é a tela inicial
     );
   }
 }
