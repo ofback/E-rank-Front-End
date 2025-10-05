@@ -4,6 +4,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:erank_app/screens/login_screen.dart';
 import 'package:erank_app/services/auth_service.dart';
+import 'package:erank_app/widgets/custom_form_field.dart'; // Importação adicionada
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -47,18 +48,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     setState(() => _isLoading = true);
 
-    // Mapeia os dados do formulário para o formato que o backend espera
     final user = {
-      'nome': _nicknameController.text, // O backend espera 'nome'
+      'nome': _nicknameController.text,
       'nickname': _nicknameController.text,
       'email': _emailController.text,
       'senha': _passwordController.text,
       'cpf': _cpfMask.getUnmaskedText(),
-      'dataNascimento': "01/01/2000", // Enviando um valor padrão por enquanto
-      // O campo 'telefone' não existe no seu UsuariosModel do backend, então não o enviamos.
+      'dataNascimento': "01/01/2000",
     };
 
-    // Chama o novo AuthService
     final success = await AuthService.register(user);
 
     setState(() => _isLoading = false);
@@ -69,7 +67,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             backgroundColor: Colors.green,
             content: Text('Usuário cadastrado com sucesso! Faça o login.')),
       );
-      // Navega para a tela de login após o sucesso
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const LoginScreen()));
     } else {
@@ -170,19 +167,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: GoogleFonts.poppins(
                           fontSize: 14, color: Colors.grey)),
                   const SizedBox(height: 30),
-                  TextFormField(
+                  CustomFormField(
                     controller: _nicknameController,
-                    decoration: _buildInputDecoration('NICKNAME',
-                        isWhiteBackground: true),
+                    label: 'NICKNAME',
                     validator:
                         RequiredValidator(errorText: 'Nickname é obrigatório')
                             .call,
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  CustomFormField(
                     controller: _emailController,
-                    decoration: _buildInputDecoration('E-MAIL',
-                        isWhiteBackground: true),
+                    label: 'E-MAIL',
                     keyboardType: TextInputType.emailAddress,
                     validator: MultiValidator([
                       RequiredValidator(errorText: 'E-mail é obrigatório'),
@@ -190,20 +185,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ]).call,
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  CustomFormField(
                     controller: _confirmEmailController,
-                    decoration: _buildInputDecoration('CONFIRME O E-MAIL',
-                        isWhiteBackground: true),
+                    label: 'CONFIRME O E-MAIL',
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) =>
                         MatchValidator(errorText: 'Os e-mails não são iguais')
                             .validateMatch(val!, _emailController.text),
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  CustomFormField(
                     controller: _cpfController,
-                    decoration:
-                        _buildInputDecoration('CPF', isWhiteBackground: true),
+                    label: 'CPF',
                     keyboardType: TextInputType.number,
                     inputFormatters: [_cpfMask],
                     validator: (val) {
@@ -214,10 +207,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  CustomFormField(
                     controller: _phoneController,
-                    decoration: _buildInputDecoration('TELEFONE',
-                        isWhiteBackground: true),
+                    label: 'TELEFONE',
                     keyboardType: TextInputType.phone,
                     inputFormatters: [_phoneMask],
                     validator: (val) {
@@ -228,11 +220,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  CustomFormField(
                     controller: _passwordController,
+                    label: 'SENHA',
                     obscureText: true,
-                    decoration:
-                        _buildInputDecoration('SENHA', isWhiteBackground: true),
                     validator: MultiValidator([
                       RequiredValidator(errorText: 'Senha é obrigatória'),
                       MinLengthValidator(8, errorText: 'Mínimo 8 caracteres'),
@@ -240,11 +231,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ]).call,
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  CustomFormField(
                     controller: _confirmPasswordController,
+                    label: 'CONFIRME A SENHA',
                     obscureText: true,
-                    decoration: _buildInputDecoration('CONFIRME A SENHA',
-                        isWhiteBackground: true),
                     validator: (val) =>
                         MatchValidator(errorText: 'Senhas não coincidem')
                             .validateMatch(val!, _passwordController.text),
@@ -293,25 +283,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  InputDecoration _buildInputDecoration(String label,
-      {bool isWhiteBackground = false}) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(
-          color: isWhiteBackground ? Colors.grey.shade500 : Colors.white54),
-      filled: true,
-      fillColor: isWhiteBackground
-          ? Colors.grey.shade100
-          : Colors.white.withOpacity(0.1),
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF7F5AF0))),
-      errorStyle: const TextStyle(color: Colors.red),
     );
   }
 }
