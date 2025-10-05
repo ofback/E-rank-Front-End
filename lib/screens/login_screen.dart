@@ -7,6 +7,7 @@ import 'package:erank_app/services/auth_service.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/screens/home_screen.dart';
 import 'package:erank_app/widgets/primary_button.dart';
+import 'package:erank_app/screens/forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -104,6 +105,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       text: 'LOGIN',
                       isLoading: _isLoading,
                       onPressed: _loginUser,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const ForgotPasswordScreen()),
+                          );
+                        },
+                        child: const Text('Esqueci minha senha'),
+                      ),
                     ),
                     const SizedBox(height: 20),
                     TextButton(
