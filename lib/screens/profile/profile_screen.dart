@@ -93,6 +93,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     });
                   },
                 ),
+                PrimaryButton(
+                  text: 'CRIAR TIME',
+                  onPressed: () {/* Navegação para a nova tela virá aqui */},
+                ),
                 const SizedBox(height: 20),
                 PrimaryButton(
                   text: 'SAIR',
