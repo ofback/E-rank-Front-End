@@ -10,22 +10,54 @@ class RequestsTab extends StatefulWidget {
 }
 
 class _RequestsTabState extends State<RequestsTab> {
+  // Usaremos um Future para a busca inicial
   late Future<List<dynamic>> _requestsFuture;
+  // E uma lista local para gerenciar o estado da UI
+  List<dynamic>? _requests;
+  int? _loadingFriendshipId;
 
   @override
   void initState() {
     super.initState();
+    _loadRequests();
+  }
+
+  void _loadRequests() {
     _requestsFuture = SocialService.getFriendRequests();
   }
 
-  void _acceptRequest(int friendshipId) {
-    // Lógica para aceitar o pedido virá aqui
-    print('Aceitar pedido: $friendshipId');
-  }
+  Future<void> _handleRequest(int friendshipId, bool accept) async {
+    setState(() {
+      _loadingFriendshipId = friendshipId;
+    });
 
-  void _declineRequest(int friendshipId) {
-    // Lógica para recusar o pedido virá aqui
-    print('Recusar pedido: $friendshipId');
+    final success = accept
+        ? await SocialService.acceptFriendRequest(friendshipId)
+        : await SocialService.declineOrRemoveFriendship(friendshipId);
+
+    if (!mounted) return;
+
+    setState(() {
+      _loadingFriendshipId = null;
+      if (success) {
+        // Remove o item da lista local para atualizar a UI instantaneamente
+        _requests?.removeWhere((req) => req['friendshipId'] == friendshipId);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.green,
+            content:
+                Text('Convite ${accept ? "aceito" : "recusado"} com sucesso!'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: AppColors.red,
+            content: Text('Ocorreu um erro. Tente novamente.'),
+          ),
+        );
+      }
+    });
   }
 
   @override
@@ -36,13 +68,18 @@ class _RequestsTabState extends State<RequestsTab> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (snapshot.hasError || !snapshot.hasData) {
+        if (snapshot.hasError) {
           return const Center(
               child: Text('Erro ao carregar convites.',
                   style: TextStyle(color: AppColors.white)));
         }
-        final requests = snapshot.data!;
-        if (requests.isEmpty) {
+
+        // Quando o future completa, inicializa nossa lista de estado
+        if (_requests == null && snapshot.hasData) {
+          _requests = snapshot.data!;
+        }
+
+        if (_requests == null || _requests!.isEmpty) {
           return const Center(
               child: Text('Nenhum convite pendente.',
                   style: TextStyle(color: AppColors.white54)));
@@ -50,9 +87,12 @@ class _RequestsTabState extends State<RequestsTab> {
 
         return ListView.builder(
           padding: const EdgeInsets.all(16.0),
-          itemCount: requests.length,
+          itemCount: _requests!.length,
           itemBuilder: (context, index) {
-            final request = requests[index];
+            final request = _requests![index];
+            final isProcessing =
+                _loadingFriendshipId == request['friendshipId'];
+
             return Card(
               color: Colors.white.withOpacity(0.05),
               margin: const EdgeInsets.symmetric(vertical: 4),
@@ -73,22 +113,31 @@ class _RequestsTabState extends State<RequestsTab> {
                   'Enviou um pedido de amizade',
                   style: TextStyle(color: AppColors.white54),
                 ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.check_circle,
-                          color: AppColors.green),
-                      onPressed: () => _acceptRequest(request['friendshipId']),
-                      tooltip: 'Aceitar',
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.cancel, color: AppColors.red),
-                      onPressed: () => _declineRequest(request['friendshipId']),
-                      tooltip: 'Recusar',
-                    ),
-                  ],
-                ),
+                trailing: isProcessing
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.check_circle,
+                                color: AppColors.green),
+                            onPressed: () =>
+                                _handleRequest(request['friendshipId'], true),
+                            tooltip: 'Aceitar',
+                          ),
+                          IconButton(
+                            icon:
+                                const Icon(Icons.cancel, color: AppColors.red),
+                            onPressed: () =>
+                                _handleRequest(request['friendshipId'], false),
+                            tooltip: 'Recusar',
+                          ),
+                        ],
+                      ),
               ),
             );
           },
