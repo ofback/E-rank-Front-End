@@ -15,7 +15,12 @@ class _SocialScreenState extends State<SocialScreen> {
   // Variáveis de estado para controlar a UI
   bool _isLoading = false;
   List<dynamic> _searchResults = [];
-  bool _hasSearched = false; // Para saber se uma busca já foi feita
+  bool _hasSearched = false;
+
+  // Novas variáveis para controlar o estado dos botões
+  final Set<int> _pendingRequestIds =
+      {}; // Guarda IDs de quem já recebeu convite
+  int? _loadingUserId; // Guarda o ID do usuário cujo botão está carregando
 
   @override
   void dispose() {
@@ -23,9 +28,8 @@ class _SocialScreenState extends State<SocialScreen> {
     super.dispose();
   }
 
-  // Função que executa a busca
   Future<void> _performSearch(String query) async {
-    if (query.isEmpty) return;
+    if (query.trim().isEmpty) return;
 
     setState(() {
       _isLoading = true;
@@ -42,10 +46,57 @@ class _SocialScreenState extends State<SocialScreen> {
     });
   }
 
-  // Função para adicionar amigo (será implementada no futuro)
-  void _addFriend(int userId) {
-    print('Adicionar amigo com ID: $userId');
-    // Aqui chamaremos o SocialService para enviar o pedido de amizade
+  // Lógica para enviar o pedido de amizade
+  Future<void> _addFriend(int userId) async {
+    setState(() {
+      _loadingUserId = userId; // Ativa o loading para este usuário
+    });
+
+    final success = await SocialService.sendFriendRequest(userId);
+
+    if (!mounted) return;
+
+    setState(() {
+      _loadingUserId = null; // Desativa o loading
+      if (success) {
+        _pendingRequestIds.add(userId); // Marca que o convite foi enviado
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: AppColors.green,
+            content: Text('Pedido de amizade enviado!'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: AppColors.red,
+            content: Text('Não foi possível enviar o pedido. Tente novamente.'),
+          ),
+        );
+      }
+    });
+  }
+
+  // Widget que decide qual ícone mostrar (loading, enviado, ou adicionar)
+  Widget _buildTrailingWidget(int userId) {
+    if (_loadingUserId == userId) {
+      return const SizedBox(
+        width: 24,
+        height: 24,
+        child:
+            CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+      );
+    }
+    if (_pendingRequestIds.contains(userId)) {
+      return const Icon(Icons.check_circle,
+          color: AppColors.green, tooltip: 'Pedido enviado');
+    }
+    return IconButton(
+      icon:
+          const Icon(Icons.person_add_alt_1_rounded, color: AppColors.primary),
+      onPressed: () => _addFriend(userId),
+      tooltip: 'Adicionar amigo',
+    );
   }
 
   // Widget que constrói a lista de resultados
@@ -77,7 +128,7 @@ class _SocialScreenState extends State<SocialScreen> {
       itemBuilder: (context, index) {
         final user = _searchResults[index];
         return Card(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withOpacity(0.05),
           margin: const EdgeInsets.symmetric(vertical: 4),
           child: ListTile(
             leading: CircleAvatar(
@@ -92,10 +143,7 @@ class _SocialScreenState extends State<SocialScreen> {
               style: const TextStyle(
                   color: AppColors.white, fontWeight: FontWeight.bold),
             ),
-            trailing: IconButton(
-              icon: const Icon(Icons.person_add, color: AppColors.green),
-              onPressed: () => _addFriend(user['id']),
-            ),
+            trailing: _buildTrailingWidget(user['id']),
           ),
         );
       },
@@ -124,11 +172,9 @@ class _SocialScreenState extends State<SocialScreen> {
                   borderSide: BorderSide.none,
                 ),
               ),
-              onSubmitted:
-                  _performSearch, // Chama a função de busca ao pressionar Enter
+              onSubmitted: _performSearch,
             ),
             const SizedBox(height: 20),
-            // Área para a lista de amigos/resultados
             Expanded(
               child: _buildResultsList(),
             ),
