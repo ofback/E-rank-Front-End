@@ -2,22 +2,18 @@ import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/services/social_service.dart';
 import 'package:flutter/material.dart';
 
-// Classe renomeada de SocialScreen para SearchTab
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});
 
   @override
-  // Classe de estado renomeada de _SocialScreenState para _SearchTabState
   State<SearchTab> createState() => _SearchTabState();
 }
 
 class _SearchTabState extends State<SearchTab> {
   final _searchController = TextEditingController();
-
-  bool _isLoading = false;
   List<dynamic> _searchResults = [];
-  bool _hasSearched = false;
-
+  bool _isLoading = false;
+  String? _searchMessage;
   final Set<int> _pendingRequestIds = {};
   int? _loadingUserId;
 
@@ -27,17 +23,29 @@ class _SearchTabState extends State<SearchTab> {
     super.dispose();
   }
 
-  Future<void> _performSearch(String query) async {
-    if (query.trim().isEmpty) return;
+  Future<void> _searchUsers(String nickname) async {
+    if (nickname.trim().isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _searchMessage = null;
+      });
+      return;
+    }
     setState(() {
       _isLoading = true;
-      _hasSearched = true;
+      _searchMessage = null;
     });
-    final results = await SocialService.searchUsers(query);
+
+    final results = await SocialService.searchUsers(nickname);
+
     if (!mounted) return;
+
     setState(() {
-      _searchResults = results;
       _isLoading = false;
+      _searchResults = results;
+      if (_searchResults.isEmpty) {
+        _searchMessage = 'Nenhum jogador encontrado.';
+      }
     });
   }
 
@@ -45,11 +53,8 @@ class _SearchTabState extends State<SearchTab> {
     setState(() {
       _loadingUserId = userId;
     });
-
     final success = await SocialService.sendFriendRequest(userId);
-
     if (!mounted) return;
-
     setState(() {
       _loadingUserId = null;
       if (success) {
@@ -76,14 +81,17 @@ class _SearchTabState extends State<SearchTab> {
       return const SizedBox(
         width: 24,
         height: 24,
-        child:
-            CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+        child: CircularProgressIndicator(strokeWidth: 2),
       );
     }
     if (_pendingRequestIds.contains(userId)) {
-      return const Icon(Icons.check_circle,
-          color: AppColors.green, tooltip: 'Pedido enviado');
+      // CORREÇÃO AQUI: Envolvendo o Icon com o Tooltip
+      return const Tooltip(
+        message: 'Pedido enviado',
+        child: Icon(Icons.check_circle, color: AppColors.green),
+      );
     }
+    // CORREÇÃO AQUI: Envolvendo o Icon com o Tooltip
     return IconButton(
       icon:
           const Icon(Icons.person_add_alt_1_rounded, color: AppColors.primary),
@@ -96,21 +104,10 @@ class _SearchTabState extends State<SearchTab> {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (!_hasSearched) {
-      return const Center(
-        child: Text(
-          'Busque por um jogador para adicioná-lo.',
-          style: TextStyle(color: AppColors.white54),
-        ),
-      );
-    }
-    if (_searchResults.isEmpty) {
-      return const Center(
-        child: Text(
-          'Nenhum jogador encontrado.',
-          style: TextStyle(color: AppColors.white54),
-        ),
-      );
+    if (_searchMessage != null) {
+      return Center(
+          child: Text(_searchMessage!,
+              style: const TextStyle(color: AppColors.white54)));
     }
     return ListView.builder(
       itemCount: _searchResults.length,
@@ -121,14 +118,14 @@ class _SearchTabState extends State<SearchTab> {
           margin: const EdgeInsets.symmetric(vertical: 4),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.primary.withOpacity(0.8),
               child: Text(
                 user['nickname']?[0].toUpperCase() ?? '?',
                 style: const TextStyle(color: AppColors.white),
               ),
             ),
             title: Text(
-              user['nickname'] ?? 'Usuário desconhecido',
+              user['nickname'] ?? 'Usuário',
               style: const TextStyle(
                   color: AppColors.white, fontWeight: FontWeight.bold),
             ),
@@ -141,7 +138,6 @@ class _SearchTabState extends State<SearchTab> {
 
   @override
   Widget build(BuildContext context) {
-    // A única diferença é que agora não temos um Scaffold, apenas o conteúdo
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -159,12 +155,10 @@ class _SearchTabState extends State<SearchTab> {
                 borderSide: BorderSide.none,
               ),
             ),
-            onSubmitted: _performSearch,
+            onSubmitted: _searchUsers,
           ),
           const SizedBox(height: 20),
-          Expanded(
-            child: _buildResultsList(),
-          ),
+          Expanded(child: _buildResultsList()),
         ],
       ),
     );
