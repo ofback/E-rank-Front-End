@@ -7,6 +7,7 @@ class TeamService {
   static Future<bool> createTeam({
     required String name,
     required String description,
+    required List<int> memberIds, // Adicione este parâmetro
   }) async {
     final token = await AuthStorage.getToken();
     if (token == null) return false;
@@ -20,6 +21,7 @@ class TeamService {
       body: json.encode({
         'nome': name,
         'descricao': description,
+        'memberIds': memberIds, // E envie-o no corpo da requisição
       }),
     );
 
