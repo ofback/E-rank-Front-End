@@ -293,8 +293,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   // --- FIM DO NOVO LAYOUT ---
 
-                  const SizedBox(height: 10),
-                  // ... (resto do código, Checkbox e Botão, continua igual)
+                  const SizedBox(height: 30),
+                  TextButton(
+                    onPressed: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginScreen())),
+                    child: const Text('Já possui uma conta? Faça Login'),
+                  ),
                 ]),
           ),
         ),
