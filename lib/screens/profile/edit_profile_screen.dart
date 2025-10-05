@@ -2,6 +2,7 @@ import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
+import 'package:erank_app/services/user_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -33,9 +34,37 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  void _saveProfile() {
-    // Lógica para salvar será implementada aqui
-    print('Salvar perfil!');
+  Future<void> _saveProfile() async {
+    setState(() => _isLoading = true);
+
+    final profileData = {
+      'nickname': _nicknameController.text,
+      'biografia': _biografiaController.text,
+    };
+
+    final success = await UserService.updateMyProfile(profileData);
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppColors.green,
+          content: Text('Perfil atualizado com sucesso!'),
+        ),
+      );
+      // Retorna para a tela anterior (ProfileScreen)
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppColors.red,
+          content: Text('Erro ao atualizar o perfil. Tente novamente.'),
+        ),
+      );
+    }
   }
 
   @override
