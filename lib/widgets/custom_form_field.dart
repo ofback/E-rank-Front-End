@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:erank_app/core/theme/app_colors.dart';
 
 class CustomFormField extends StatelessWidget {
   final TextEditingController controller;
@@ -43,9 +44,9 @@ class CustomFormField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF7F5AF0)),
+          borderSide: const BorderSide(color: AppColors.primary),
         ),
-        errorStyle: const TextStyle(color: Colors.redAccent),
+        errorStyle: const TextStyle(color: AppColors.red),
       ),
       validator: validator,
     );
