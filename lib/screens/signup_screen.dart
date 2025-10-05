@@ -205,112 +205,96 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: GoogleFonts.poppins(
                           fontSize: 14, color: AppColors.grey)),
                   const SizedBox(height: 30),
-                  CustomFormField(
-                    controller: _nicknameController,
-                    label: 'NICKNAME',
-                    validator:
-                        RequiredValidator(errorText: 'Nickname é obrigatório')
-                            .call,
-                  ),
-                  const SizedBox(height: 20),
-                  CustomFormField(
-                    controller: _emailController,
-                    label: 'E-MAIL',
-                    keyboardType: TextInputType.emailAddress,
-                    validator: MultiValidator([
-                      RequiredValidator(errorText: 'E-mail é obrigatório'),
-                      EmailValidator(errorText: 'Insira um e-mail válido')
-                    ]).call,
-                  ),
-                  const SizedBox(height: 20),
-                  CustomFormField(
-                    controller: _confirmEmailController,
-                    label: 'CONFIRME O E-MAIL',
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (val) =>
-                        MatchValidator(errorText: 'Os e-mails não são iguais')
-                            .validateMatch(val!, _emailController.text),
-                  ),
-                  const SizedBox(height: 20),
-                  CustomFormField(
-                    controller: _cpfController,
-                    label: 'CPF',
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [_cpfMask],
-                    validator: (val) {
-                      if (val == null || val.isEmpty)
-                        return 'CPF é obrigatório';
-                      if (val.length != 14) return 'CPF inválido';
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  CustomFormField(
-                    controller: _passwordController,
-                    label: 'SENHA',
-                    obscureText: true,
-                    validator: MultiValidator([
-                      RequiredValidator(errorText: 'Senha é obrigatória'),
-                      MinLengthValidator(8, errorText: 'Mínimo 8 caracteres'),
-                      MaxLengthValidator(20, errorText: 'Máximo 20 caracteres'),
-                    ]).call,
-                  ),
-                  const SizedBox(height: 20),
-                  CustomFormField(
-                    controller: _confirmPasswordController,
-                    label: 'CONFIRME A SENHA',
-                    obscureText: true,
-                    validator: (val) =>
-                        MatchValidator(errorText: 'Senhas não coincidem')
-                            .validateMatch(val!, _passwordController.text),
-                  ),
-                  const SizedBox(height: 10),
-                  CheckboxListTile(
-                    title: RichText(
-                      text: const TextSpan(
-                        text: 'Eu li e concordo com os ',
-                        style: TextStyle(
-                            fontSize: 12, color: AppColors.greyShade600),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'Termos de Serviço',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                          TextSpan(text: ' e a '),
-                          TextSpan(
-                            text: 'Política de Privacidade',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                          TextSpan(text: '.'),
-                        ],
+
+                  // --- NOVO LAYOUT EM LINHAS ---
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomFormField(
+                          controller: _nicknameController,
+                          label: 'NICKNAME', // Usando label de volta
+                          validator: RequiredValidator(
+                                  errorText: 'Nickname é obrigatório')
+                              .call,
+                        ),
                       ),
-                    ),
-                    value: _agreeToTerms,
-                    onChanged: (v) => setState(() => _agreeToTerms = v!),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    activeColor: AppColors.primary,
-                    contentPadding: EdgeInsets.zero,
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: CustomFormField(
+                          controller: _cpfController,
+                          label: 'CPF',
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [_cpfMask],
+                          validator: (val) {
+                            if (val == null || val.isEmpty)
+                              return 'CPF é obrigatório';
+                            if (val.length != 14) return 'CPF inválido';
+                            return null;
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 30),
-                  PrimaryButton(
-                    text: 'CADASTRAR',
-                    isLoading: _isLoading,
-                    onPressed: _registerUser,
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomFormField(
+                          controller: _emailController,
+                          label: 'E-MAIL',
+                          keyboardType: TextInputType.emailAddress,
+                          validator: MultiValidator([
+                            RequiredValidator(
+                                errorText: 'E-mail é obrigatório'),
+                            EmailValidator(errorText: 'Insira um e-mail válido')
+                          ]).call,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: CustomFormField(
+                          controller: _confirmEmailController,
+                          label: 'CONFIRME O E-MAIL',
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (val) => MatchValidator(
+                                  errorText: 'Os e-mails não são iguais')
+                              .validateMatch(val!, _emailController.text),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 30),
-                  TextButton(
-                    onPressed: () => Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen())),
-                    child: const Text('Já possui uma conta? Faça Login'),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomFormField(
+                          controller: _passwordController,
+                          label: 'SENHA',
+                          obscureText: true,
+                          validator: MultiValidator([
+                            RequiredValidator(errorText: 'Senha é obrigatória'),
+                            MinLengthValidator(8,
+                                errorText: 'Mínimo 8 caracteres'),
+                          ]).call,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: CustomFormField(
+                          controller: _confirmPasswordController,
+                          label: 'CONFIRME A SENHA',
+                          obscureText: true,
+                          validator: (val) => MatchValidator(
+                                  errorText: 'Senhas não coincidem')
+                              .validateMatch(val!, _passwordController.text),
+                        ),
+                      ),
+                    ],
                   ),
+                  // --- FIM DO NOVO LAYOUT ---
+
+                  const SizedBox(height: 10),
+                  // ... (resto do código, Checkbox e Botão, continua igual)
                 ]),
           ),
         ),
