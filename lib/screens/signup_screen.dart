@@ -28,6 +28,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
 
   bool _isLoading = false;
+  bool _agreeToTerms = false;
   bool _acceptMarketing = false;
 
   Widget _buildSmallScreenHeader() {
@@ -62,6 +63,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _registerUser() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!_agreeToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppColors.red,
+          content:
+              Text('Você deve aceitar os Termos de Serviço para continuar.'),
+        ),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -254,11 +266,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 10),
                   CheckboxListTile(
-                    title: const Text(
-                        'Sim, permito o envio de informações e eventos.',
-                        style: TextStyle(fontSize: 12)),
-                    value: _acceptMarketing,
-                    onChanged: (v) => setState(() => _acceptMarketing = v!),
+                    title: RichText(
+                      text: TextSpan(
+                        text: 'Eu li e concordo com os ',
+                        style: TextStyle(
+                            fontSize: 12, color: AppColors.greyShade600),
+                        children: <TextSpan>[
+                          TextSpan(
+                              text: 'Termos de Serviço',
+                              style: TextStyle(
+                                  color: AppColors.primary,
+                                  decoration: TextDecoration.underline)),
+                          const TextSpan(text: ' e a '),
+                          TextSpan(
+                              text: 'Política de Privacidade',
+                              style: TextStyle(
+                                  color: AppColors.primary,
+                                  decoration: TextDecoration.underline)),
+                          const TextSpan(text: '.'),
+                        ],
+                      ),
+                    ),
+                    value: _agreeToTerms,
+                    onChanged: (v) => setState(() => _agreeToTerms = v!),
                     controlAffinity: ListTileControlAffinity.leading,
                     activeColor: AppColors.primary,
                     contentPadding: EdgeInsets.zero,
