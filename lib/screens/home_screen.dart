@@ -1,5 +1,6 @@
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:erank_app/screens/profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,10 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Text('Página de Início',
           style: TextStyle(color: AppColors.white, fontSize: 24)),
     ),
-    Center(
-      child: Text('Página de Perfil',
-          style: TextStyle(color: AppColors.white, fontSize: 24)),
-    ),
+    ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
