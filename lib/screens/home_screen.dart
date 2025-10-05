@@ -19,6 +19,12 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Text('Página de Início',
           style: TextStyle(color: AppColors.white, fontSize: 24)),
     ),
+    SocialScreen(),
+    Center(
+      child: Text('Página de Times',
+          style: TextStyle(color: AppColors.white, fontSize: 24)),
+    ),
+    ProfileScreen(),
     Center(
       child: Text('Página Social (Amigos)',
           style: TextStyle(color: AppColors.white, fontSize: 24)),
@@ -57,6 +63,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
             label: 'Social',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shield),
+            label: 'Times',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
