@@ -1,6 +1,8 @@
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
+import 'package:erank_app/services/auth_service.dart';
+import 'package:erank_app/screens/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -10,9 +12,19 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  void _logout() {
-    // Lógica de logout virá aqui
-    print('Logout Pressionado!');
+  Future<void> _logout() async {
+    // Chama o serviço de autenticação para limpar os dados salvos
+    await AuthService.logout();
+
+    // Garante que não vamos tentar navegar se o widget já foi removido da tela
+    if (!mounted) return;
+
+    // Navega para a LoginScreen e remove todas as telas anteriores da pilha.
+    // Isso impede que o usuário use o botão "voltar" do navegador/app para retornar à HomeScreen.
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   @override
