@@ -8,18 +8,24 @@ class UserService {
       ApiConstants.baseUrl; // ajuste se for device real
 
   // Read - buscar perfil
-  static Future<Map<String, dynamic>?> fetchProfile(String userId) async {
+  static Future<Map<String, dynamic>?> fetchMyProfile() async {
     final token = await AuthStorage.getToken();
+    if (token == null) return null;
+
+    // Agora fazemos a chamada para o endpoint correto e eficiente!
     final response = await http.get(
-      Uri.parse('$baseUrl/$userId'),
+      Uri.parse('${ApiConstants.baseUrl}/usuarios/me'),
       headers: {
+        'Authorization': token,
         'Content-Type': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
       },
     );
+
     if (response.statusCode == 200) {
+      // O backend agora retorna diretamente o objeto do usuário logado.
       return json.decode(response.body) as Map<String, dynamic>;
     }
+
     return null;
   }
 
