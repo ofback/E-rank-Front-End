@@ -7,6 +7,23 @@ class UserService {
   static const String baseUrl =
       ApiConstants.baseUrl; // ajuste se for device real
 
+  static Future<bool> updateMyProfile(Map<String, String> profileData) async {
+    final token = await AuthStorage.getToken();
+    if (token == null) return false;
+
+    final response = await http.put(
+      Uri.parse('${ApiConstants.baseUrl}/usuarios/me'),
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(profileData),
+    );
+
+    // O backend retorna 200 OK em caso de sucesso
+    return response.statusCode == 200;
+  }
+
   // Read - buscar perfil
   static Future<Map<String, dynamic>?> fetchMyProfile() async {
     final token = await AuthStorage.getToken();
