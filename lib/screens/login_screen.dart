@@ -5,6 +5,7 @@ import 'package:erank_app/screens/signup_screen.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/services/auth_service.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
+import 'package:erank_app/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -39,13 +40,11 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            backgroundColor: AppColors.green,
-            content: Text('Login realizado com sucesso!')),
+      // Navega para a HomeScreen e remove todas as telas anteriores da pilha.
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (Route<dynamic> route) => false,
       );
-      // TODO: Navegar para a tela principal (HomeScreen) do aplicativo.
-      // Por enquanto, vamos apenas mostrar a snackbar.
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
