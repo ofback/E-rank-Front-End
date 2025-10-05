@@ -38,14 +38,14 @@ class _CustomFormFieldState extends State<CustomFormField> {
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
       decoration: InputDecoration(
-        labelText: widget.label,
-        labelStyle: TextStyle(
+        hintText: widget.label, // ALTERADO DE labelText
+        hintStyle: TextStyle(
+          // ALTERADO DE labelStyle
           color: isDarkMode ? AppColors.white54 : AppColors.greyShade600,
         ),
         filled: true,
-        fillColor: isDarkMode
-            ? AppColors.white.withOpacity(0.1)
-            : AppColors.greyShade100,
+        fillColor:
+            isDarkMode ? Colors.white.withOpacity(0.1) : AppColors.greyShade100,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide.none,
