@@ -1,6 +1,7 @@
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/screens/profile/profile_screen.dart';
+import 'package:erank_app/screens/social/social_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Text('Página Social (Amigos)',
           style: TextStyle(color: AppColors.white, fontSize: 24)),
     ),
+    SocialScreen(),
     ProfileScreen(),
   ];
 
