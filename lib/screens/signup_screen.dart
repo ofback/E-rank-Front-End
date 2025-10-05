@@ -267,23 +267,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(height: 10),
                   CheckboxListTile(
                     title: RichText(
-                      text: TextSpan(
+                      text: const TextSpan(
                         text: 'Eu li e concordo com os ',
                         style: TextStyle(
                             fontSize: 12, color: AppColors.greyShade600),
                         children: <TextSpan>[
                           TextSpan(
-                              text: 'Termos de Serviço',
-                              style: TextStyle(
-                                  color: AppColors.primary,
-                                  decoration: TextDecoration.underline)),
-                          const TextSpan(text: ' e a '),
+                            text: 'Termos de Serviço',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                          TextSpan(text: ' e a '),
                           TextSpan(
-                              text: 'Política de Privacidade',
-                              style: TextStyle(
-                                  color: AppColors.primary,
-                                  decoration: TextDecoration.underline)),
-                          const TextSpan(text: '.'),
+                            text: 'Política de Privacidade',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                          TextSpan(text: '.'),
                         ],
                       ),
                     ),
