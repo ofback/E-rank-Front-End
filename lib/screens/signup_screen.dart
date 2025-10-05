@@ -157,19 +157,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            _buildSmallScreenHeader(),
-                            _buildSignUpForm(),
-                          ],
-                        ),
-                      ),
+                      child: Center(child: _buildSignUpForm()),
                     ),
                   ),
                 ],
               )
-            : Center(child: _buildSignUpForm()),
+            // --- CORREÇÃO PARA TELAS PEQUENAS/MÉDIAS ---
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight:
+                            constraints.maxHeight, // Garante altura mínima
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildSmallScreenHeader(),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: _buildSignUpForm(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }
