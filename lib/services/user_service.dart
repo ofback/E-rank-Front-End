@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'auth_storage.dart';
+import 'package:erank_app/core/constants/api_constants.dart';
 
 class UserService {
-  static const String baseUrl = 'http://10.0.2.2:8080/usuarios'; // ajuste se for device real
+  static const String baseUrl =
+      ApiConstants.baseUrl; // ajuste se for device real
 
   // Read - buscar perfil
   static Future<Map<String, dynamic>?> fetchProfile(String userId) async {
@@ -22,7 +24,8 @@ class UserService {
   }
 
   // Update - atualizar dados
-  static Future<bool> updateProfile(String userId, Map<String, dynamic> data) async {
+  static Future<bool> updateProfile(
+      String userId, Map<String, dynamic> data) async {
     final token = await AuthStorage.getToken();
     final response = await http.put(
       Uri.parse('$baseUrl/$userId'),
