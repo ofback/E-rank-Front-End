@@ -21,12 +21,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _confirmEmailController = TextEditingController();
   final _cpfController = TextEditingController();
-  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  final _phoneMask = MaskTextInputFormatter(
-      mask: '(##) #####-####', filter: {"#": RegExp(r'[0-9]')});
   final _cpfMask = MaskTextInputFormatter(
       mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
 
@@ -58,7 +55,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _emailController.dispose();
     _confirmEmailController.dispose();
     _cpfController.dispose();
-    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -233,19 +229,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       if (val == null || val.isEmpty)
                         return 'CPF é obrigatório';
                       if (val.length != 14) return 'CPF inválido';
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  CustomFormField(
-                    controller: _phoneController,
-                    label: 'TELEFONE',
-                    keyboardType: TextInputType.phone,
-                    inputFormatters: [_phoneMask],
-                    validator: (val) {
-                      if (val == null || val.isEmpty)
-                        return 'Telefone é obrigatório';
-                      if (val.length != 15) return 'Telefone inválido';
                       return null;
                     },
                   ),
