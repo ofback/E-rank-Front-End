@@ -105,8 +105,9 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
               CustomFormField(
                 controller: _teamNameController,
                 label: 'Nome do Time',
-                validator: RequiredValidator(
-                    errorText: 'O nome do time é obrigatório'),
+                validator:
+                    RequiredValidator(errorText: 'O nome do time é obrigatório')
+                        .call,
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -132,7 +133,8 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
                   ),
                 ),
                 validator:
-                    RequiredValidator(errorText: 'A descrição é obrigatória'),
+                    RequiredValidator(errorText: 'A descrição é obrigatória')
+                        .call,
               ),
               const SizedBox(height: 40),
 

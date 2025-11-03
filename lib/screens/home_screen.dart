@@ -1,84 +1,143 @@
-import 'package:erank_app/core/theme/app_colors.dart';
+// ESTA LINHA É A MAIS IMPORTANTE E RESOLVE TODOS OS ERROS
 import 'package:flutter/material.dart';
-import 'package:erank_app/screens/profile/profile_screen.dart';
-import 'package:erank_app/screens/social/social_screen.dart';
+
+import 'package:erank_app/services/team_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+  late Future<List<dynamic>> _myTeamsFuture;
+  final TeamService _teamService = TeamService();
 
-  // Por enquanto, apenas uma lista de widgets simples para cada página
-  static const List<Widget> _widgetOptions = <Widget>[
-    Center(
-      child: Text('Página de Início',
-          style: TextStyle(color: AppColors.white, fontSize: 24)),
-    ),
-    SocialScreen(),
-    Center(
-      child: Text('Página de Times',
-          style: TextStyle(color: AppColors.white, fontSize: 24)),
-    ),
-    ProfileScreen(),
-    Center(
-      child: Text('Página Social (Amigos)',
-          style: TextStyle(color: AppColors.white, fontSize: 24)),
-    ),
-    SocialScreen(),
-    ProfileScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadMyTeams();
+  }
 
-  void _onItemTapped(int index) {
+  void _loadMyTeams() {
     setState(() {
-      _selectedIndex = index;
+      _myTeamsFuture = _teamService.getMyTeams();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('E-Rank'),
-        backgroundColor: AppColors.background,
-        centerTitle: true,
-        automaticallyImplyLeading: false, // Remove a seta de "voltar"
-      ),
-      body: _widgetOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Início',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Social',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shield),
-            label: 'Times',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              // Lógica de logout aqui
+            },
           ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.grey,
-        onTap: _onItemTapped,
-        backgroundColor: AppColors.background,
       ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Meus Times',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder<List<dynamic>>(
+              future: _myTeamsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(
+                      child: Text('Erro ao carregar times: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                      child: Text('Você ainda não faz parte de um time.'));
+                }
+
+                final myTeams = snapshot.data!;
+
+                return ListView.builder(
+                  itemCount: myTeams.length,
+                  itemBuilder: (context, index) {
+                    final team = myTeams[index];
+                    final int teamId = team['id'] is int
+                        ? team['id']
+                        : int.parse(team['id'].toString());
+                    final String teamName = team['nome'] ?? 'Nome indisponível';
+
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
+                      child: ListTile(
+                        title: Text(teamName),
+                        subtitle: Text(team['cargo'] ?? 'Cargo indisponível'),
+                        trailing: IconButton(
+                          icon:
+                              const Icon(Icons.exit_to_app, color: Colors.red),
+                          onPressed: () {
+                            _showLeaveTeamDialog(context, teamId, teamName);
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLeaveTeamDialog(BuildContext context, int teamId, String teamName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sair do Time'),
+          content:
+              Text('Você tem certeza que deseja sair do time "$teamName"?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Sair', style: TextStyle(color: Colors.red)),
+              onPressed: () async {
+                bool success = await _teamService.leaveTeam(teamId);
+
+                Navigator.of(context).pop();
+
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Você saiu do time "$teamName"!')),
+                  );
+                  _loadMyTeams();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Erro ao tentar sair do time.')),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

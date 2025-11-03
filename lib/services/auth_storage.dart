@@ -1,32 +1,43 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthStorage {
-  static const String _tokenKey = 'token';
-  static const String _emailKey = 'email';
+  static final _storage = FlutterSecureStorage();
+  static const _tokenKey = 'auth_token';
+  static const _userIdKey = 'user_id'; // Chave para o ID do usuário
 
-  // Salvar token e email
-  static Future<void> saveUserData(String token, String email) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, token);
-    await prefs.setString(_emailKey, email);
+  // --- Métodos do Token ---
+  static Future<void> saveToken(String token) async {
+    await _storage.write(key: _tokenKey, value: token);
   }
 
-  // Recuperar token
   static Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_tokenKey);
+    return await _storage.read(key: _tokenKey);
   }
 
-  // Recuperar email
-  static Future<String?> getEmail() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_emailKey);
+  static Future<void> deleteToken() async {
+    await _storage.delete(key: _tokenKey);
   }
 
-  // Remover dados do usuário (logout)
-  static Future<void> clearUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
-    await prefs.remove(_emailKey);
+  // --- Métodos do User ID (A serem adicionados) ---
+  static Future<void> saveUserId(int userId) async {
+    await _storage.write(key: _userIdKey, value: userId.toString());
+  }
+
+  static Future<int?> getUserId() async {
+    final userIdString = await _storage.read(key: _userIdKey);
+    if (userIdString == null) {
+      return null;
+    }
+    return int.tryParse(userIdString);
+  }
+
+  static Future<void> deleteUserId() async {
+    await _storage.delete(key: _userIdKey);
+  }
+
+  // --- Método de Logout completo ---
+  static Future<void> logout() async {
+    await deleteToken();
+    await deleteUserId();
   }
 }
