@@ -6,7 +6,6 @@ import 'package:erank_app/screens/login_screen.dart';
 import 'package:erank_app/services/auth_service.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
-import 'package:erank_app/widgets/primary_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -28,8 +27,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
 
   bool _isLoading = false;
-  bool _agreeToTerms = false;
-  bool _acceptMarketing = false;
+  final bool _agreeToTerms = false;
+  final bool _acceptMarketing = false;
 
   Widget _buildSmallScreenHeader() {
     return Column(
@@ -252,8 +251,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         keyboardType: TextInputType.number,
                         inputFormatters: [_cpfMask],
                         validator: (val) {
-                          if (val == null || val.isEmpty)
+                          if (val == null || val.isEmpty) {
                             return 'CPF é obrigatório';
+                          }
                           if (val.length != 14) return 'CPF inválido';
                           return null;
                         },
