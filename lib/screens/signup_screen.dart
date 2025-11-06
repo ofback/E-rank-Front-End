@@ -6,6 +6,7 @@ import 'package:erank_app/screens/login_screen.dart';
 import 'package:erank_app/services/auth_service.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
+import 'package:erank_app/widgets/primary_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -27,8 +28,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
 
   bool _isLoading = false;
-  final bool _agreeToTerms = false;
-  final bool _acceptMarketing = false;
+  bool _agreeToTerms = false; // Corrigido: Removido 'final'
+  bool _acceptMarketing = false; // Corrigido: Removido 'final'
 
   Widget _buildSmallScreenHeader() {
     return Column(
@@ -77,12 +78,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     final user = {
-      'nome': _nicknameController.text,
+      'nome': _nicknameController.text, // O backend espera 'nome'
       'nickname': _nicknameController.text,
       'email': _emailController.text,
       'senha': _passwordController.text,
-      'cpf': _cpfMask.getUnmaskedText(),
-      'dataNascimento': "01/01/2000",
+      'cpf': _cpfMask.getUnmaskedText(), // O backend espera 'cpf'
+      'dataNascimento': "01/01/2000", // O backend espera 'dataNascimento'
     };
 
     final success = await AuthService.register(user);
@@ -156,12 +157,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      child: Center(child: _buildSignUpForm()),
+                      // --- CORREÇÃO DE LAYOUT (TELA GRANDE) ---
+                      // Adicionado SingleChildScrollView e Padding
+                      child: SingleChildScrollView(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 40),
+                            child: _buildSignUpFormContent(), // Renomeado
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               )
-            // --- CORREÇÃO PARA TELAS PEQUENAS/MÉDIAS ---
+            // --- LAYOUT DE TELA PEQUENA (JÁ ESTAVA OK) ---
             : LayoutBuilder(
                 builder: (context, constraints) {
                   return SingleChildScrollView(
@@ -178,8 +189,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24.0),
-                              child: _buildSignUpForm(),
+                              // --- CORREÇÃO DE LAYOUT (TELA PEQUENA) ---
+                              child: _buildSignUpFormContent(), // Renomeado
                             ),
+                            const SizedBox(
+                                height: 40), // Espaço extra no final da rolagem
                           ],
                         ),
                       ),
@@ -191,122 +205,140 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildSignUpForm() {
+  // --- MÉTODO RENOMEADO E CORRIGIDO ---
+  // Removido o SingleChildScrollView interno que causava o conflito
+  Widget _buildSignUpFormContent() {
     // Determina o número de colunas com base na largura da tela
     final screenWidth = MediaQuery.of(context).size.width;
     final crossAxisCount =
         screenWidth > 750 ? 2 : 1; // 2 colunas se a tela for larga
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 750),
-        child: Container(
-          decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5)),
-              ]),
-          padding: const EdgeInsets.all(32),
-          child: Form(
-            key: _formKey,
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text('Comece sua jornada',
-                      style: GoogleFonts.poppins(
-                          fontSize: 24,
-                          color: AppColors.black87,
-                          fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  Text('Preencha seus dados para entrar no ranking.',
-                      style: GoogleFonts.poppins(
-                          fontSize: 14, color: AppColors.grey)),
-                  const SizedBox(height: 30),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 750),
+      child: Container(
+        decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5)),
+            ]),
+        padding: const EdgeInsets.all(32),
+        child: Form(
+          key: _formKey,
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text('Comece sua jornada',
+                style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    color: AppColors.black87,
+                    fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('Preencha seus dados para entrar no ranking.',
+                style:
+                    GoogleFonts.poppins(fontSize: 14, color: AppColors.grey)),
+            const SizedBox(height: 30),
 
-                  // --- NOVO LAYOUT COM GRIDVIEW ---
-                  GridView.count(
-                    crossAxisCount: crossAxisCount,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 20,
-                    childAspectRatio:
-                        4, // Ajuste este valor para mudar a altura dos campos
-                    children: [
-                      CustomFormField(
-                        controller: _nicknameController,
-                        label: 'NICKNAME',
-                        validator: RequiredValidator(
-                                errorText: 'Nickname é obrigatório')
-                            .call,
-                      ),
-                      CustomFormField(
-                        controller: _cpfController,
-                        label: 'CPF',
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [_cpfMask],
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return 'CPF é obrigatório';
-                          }
-                          if (val.length != 14) return 'CPF inválido';
-                          return null;
-                        },
-                      ),
-                      CustomFormField(
-                        controller: _emailController,
-                        label: 'E-MAIL',
-                        keyboardType: TextInputType.emailAddress,
-                        validator: MultiValidator([
-                          RequiredValidator(errorText: 'E-mail é obrigatório'),
-                          EmailValidator(errorText: 'Insira um e-mail válido')
-                        ]).call,
-                      ),
-                      CustomFormField(
-                        controller: _confirmEmailController,
-                        label: 'CONFIRME O E-MAIL',
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (val) => MatchValidator(
-                                errorText: 'Os e-mails não são iguais')
-                            .validateMatch(val!, _emailController.text),
-                      ),
-                      CustomFormField(
-                        controller: _passwordController,
-                        label: 'SENHA',
-                        obscureText: true,
-                        validator: MultiValidator([
-                          RequiredValidator(errorText: 'Senha é obrigatória'),
-                          MinLengthValidator(8,
-                              errorText: 'Mínimo 8 caracteres'),
-                        ]).call,
-                      ),
-                      CustomFormField(
-                        controller: _confirmPasswordController,
-                        label: 'CONFIRME A SENHA',
-                        obscureText: true,
-                        validator: (val) =>
-                            MatchValidator(errorText: 'Senhas não coincidem')
-                                .validateMatch(val!, _passwordController.text),
-                      ),
-                    ],
-                  ),
-                  // --- FIM DO NOVO LAYOUT ---
+            // --- NOVO LAYOUT COM GRIDVIEW ---
+            GridView.count(
+              crossAxisCount: crossAxisCount,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 20,
+              childAspectRatio:
+                  4, // Ajuste este valor para mudar a altura dos campos
+              children: [
+                CustomFormField(
+                  controller: _nicknameController,
+                  label: 'NICKNAME',
+                  validator:
+                      RequiredValidator(errorText: 'Nickname é obrigatório')
+                          .call,
+                ),
+                CustomFormField(
+                  controller: _cpfController,
+                  label: 'CPF',
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [_cpfMask],
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return 'CPF é obrigatório';
+                    }
+                    if (val.length != 14) return 'CPF inválido';
+                    return null;
+                  },
+                ),
+                CustomFormField(
+                  controller: _emailController,
+                  label: 'E-MAIL',
+                  keyboardType: TextInputType.emailAddress,
+                  validator: MultiValidator([
+                    RequiredValidator(errorText: 'E-mail é obrigatório'),
+                    EmailValidator(errorText: 'Insira um e-mail válido')
+                  ]).call,
+                ),
+                CustomFormField(
+                  controller: _confirmEmailController,
+                  label: 'CONFIRME O E-MAIL',
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (val) =>
+                      MatchValidator(errorText: 'Os e-mails não são iguais')
+                          .validateMatch(val!, _emailController.text),
+                ),
+                CustomFormField(
+                  controller: _passwordController,
+                  label: 'SENHA',
+                  obscureText: true,
+                  validator: MultiValidator([
+                    RequiredValidator(errorText: 'Senha é obrigatória'),
+                    MinLengthValidator(8, errorText: 'Mínimo 8 caracteres'),
+                  ]).call,
+                ),
+                CustomFormField(
+                  controller: _confirmPasswordController,
+                  label: 'CONFIRME A SENHA',
+                  obscureText: true,
+                  validator: (val) =>
+                      MatchValidator(errorText: 'Senhas não coincidem')
+                          .validateMatch(val!, _passwordController.text),
+                ),
+              ],
+            ),
+            // --- FIM DO NOVO LAYOUT ---
 
-                  const SizedBox(height: 30),
-                  TextButton(
-                    onPressed: () => Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen())),
-                    child: const Text('Já possui uma conta? Faça Login'),
+            const SizedBox(height: 20),
+            CheckboxListTile(
+              title: Text("Eu li e aceito os Termos de Serviço",
+                  style: GoogleFonts.poppins(fontSize: 14)),
+              value: _agreeToTerms,
+              onChanged: (newValue) {
+                setState(() {
+                  _agreeToTerms = newValue ?? false;
+                });
+              },
+              controlAffinity: ListTileControlAffinity.leading,
+              contentPadding: EdgeInsets.zero,
+            ),
+
+            const SizedBox(height: 20),
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : PrimaryButton(
+                    text: 'CADASTRAR',
+                    onPressed: _registerUser,
                   ),
-                ]),
-          ),
+
+            const SizedBox(height: 10),
+
+            TextButton(
+              onPressed: () => Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen())),
+              child: const Text('Já possui uma conta? Faça Login'),
+            ),
+          ]),
         ),
       ),
     );
