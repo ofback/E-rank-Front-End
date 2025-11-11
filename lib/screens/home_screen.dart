@@ -1,7 +1,5 @@
-// ESTA LINHA É A MAIS IMPORTANTE E RESOLVE TODOS OS ERROS
 import 'package:flutter/material.dart';
-
-import 'package:erank_app/services/team_service.dart';
+import 'package:erank_app/services/team_service.dart'; // Importe o serviço
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,7 +10,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<dynamic>> _myTeamsFuture;
-  final TeamService _teamService = TeamService();
+
+  // CORREÇÃO: Linha removida. Não precisamos mais de uma instância.
+  // final TeamService _teamService = TeamService();
 
   @override
   void initState() {
@@ -22,7 +22,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadMyTeams() {
     setState(() {
-      _myTeamsFuture = _teamService.getMyTeams();
+      // CORREÇÃO: Chamando o método "static" diretamente pela classe.
+      _myTeamsFuture = TeamService.getMyTeams();
     });
   }
 
@@ -54,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FutureBuilder<List<dynamic>>(
               future: _myTeamsFuture,
               builder: (context, snapshot) {
+                // ... (O restante do seu FutureBuilder permanece o mesmo)
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
@@ -118,7 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               child: const Text('Sair', style: TextStyle(color: Colors.red)),
               onPressed: () async {
-                bool success = await _teamService.leaveTeam(teamId);
+                // CORREÇÃO: Chamando o método "static" diretamente pela classe.
+                bool success = await TeamService.leaveTeam(teamId);
 
                 Navigator.of(context).pop();
 

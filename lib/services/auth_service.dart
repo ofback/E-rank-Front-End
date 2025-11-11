@@ -24,7 +24,9 @@ class AuthService {
 
   // Fazer login
   // Não há endpoint de login. Validamos as credenciais tentando acessar um recurso protegido.
-  Future<bool> login(String email, String password) async {
+
+  // CORREÇÃO: Adicionamos a palavra-chave "static" aqui
+  static Future<bool> login(String email, String password) async {
     final url = Uri.parse('${ApiConstants.baseUrl}/login');
 
     try {

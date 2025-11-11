@@ -4,9 +4,6 @@ import 'auth_storage.dart';
 import 'package:erank_app/core/constants/api_constants.dart';
 
 class UserService {
-  static const String baseUrl =
-      ApiConstants.baseUrl; // ajuste se for device real
-
   static Future<bool> updateMyProfile(Map<String, String> profileData) async {
     final token = await AuthStorage.getToken();
     if (token == null) return false;
@@ -14,7 +11,8 @@ class UserService {
     final response = await http.put(
       Uri.parse('${ApiConstants.baseUrl}/usuarios/me'),
       headers: {
-        'Authorization': token,
+        // CORREÇÃO (Ponto 2): Padronizado para 'Bearer $token'
+        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
       body: json.encode(profileData),
@@ -33,7 +31,8 @@ class UserService {
     final response = await http.get(
       Uri.parse('${ApiConstants.baseUrl}/usuarios/me'),
       headers: {
-        'Authorization': token,
+        // CORREÇÃO (Ponto 2): Padronizado para 'Bearer $token'
+        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
     );
@@ -46,14 +45,16 @@ class UserService {
     return null;
   }
 
-  // Update - atualizar dados
+  // Update - atualizar dados (Método antigo/de admin)
   static Future<bool> updateProfile(
       String userId, Map<String, dynamic> data) async {
     final token = await AuthStorage.getToken();
     final response = await http.put(
-      Uri.parse('$baseUrl/$userId'),
+      // CORREÇÃO (Ponto 4): Usando ApiConstants.baseUrl
+      Uri.parse('${ApiConstants.baseUrl}/$userId'),
       headers: {
         'Content-Type': 'application/json',
+        // Este já estava correto (Ponto 2)
         if (token != null) 'Authorization': 'Bearer $token',
       },
       body: json.encode(data),
@@ -61,18 +62,21 @@ class UserService {
     return response.statusCode == 200;
   }
 
-  // Delete - excluir conta
+  // Delete - excluir conta (Método antigo/de admin)
   static Future<bool> deleteAccount(String userId) async {
     final token = await AuthStorage.getToken();
     final response = await http.delete(
-      Uri.parse('$baseUrl/$userId'),
+      // CORREÇÃO (Ponto 4): Usando ApiConstants.baseUrl
+      Uri.parse('${ApiConstants.baseUrl}/$userId'),
       headers: {
         'Content-Type': 'application/json',
+        // Este já estava correto (Ponto 2)
         if (token != null) 'Authorization': 'Bearer $token',
       },
     );
     if (response.statusCode == 200 || response.statusCode == 204) {
-      await AuthStorage.clearUserData(); // limpa login
+      // CORREÇÃO (Ponto 3): Método corrigido de 'clearUserData' para 'logout'
+      await AuthStorage.logout(); // limpa login
       return true;
     }
     return false;
