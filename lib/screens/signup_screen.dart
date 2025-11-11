@@ -29,7 +29,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool _isLoading = false;
   bool _agreeToTerms = false; // Corrigido: Removido 'final'
-  bool _acceptMarketing = false; // Corrigido: Removido 'final'
+  // bool _acceptMarketing = false; // Corrigido: Removido 'final'
 
   Widget _buildSmallScreenHeader() {
     return Column(

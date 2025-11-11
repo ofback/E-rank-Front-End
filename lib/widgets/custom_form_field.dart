@@ -25,16 +25,20 @@ class CustomFormField extends StatefulWidget {
 }
 
 class _CustomFormFieldState extends State<CustomFormField> {
+  // CORREÇÃO 1: A variável de estado é movida para aqui (fora do 'build').
+  // Assim, o seu valor é preservado quando o 'setState' é chamado.
+  bool isObscured = true;
+
   @override
   Widget build(BuildContext context) {
-    bool isObscured = true;
-    // Detecta se o fundo é escuro para adaptar o estilo.
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // CORREÇÃO 2: A variável 'isDarkMode' foi removida pois não estava
+    // a ser usada em lado nenhum.
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return TextFormField(
-      controller: widget.controller, // Use widget. para acessar as propriedades
-      obscureText:
-          widget.obscureText ? isObscured : false, // Use a variável de estado
+      controller: widget.controller,
+      // A lógica do obscureText agora usa a variável de estado 'isObscured'
+      obscureText: widget.obscureText ? isObscured : false,
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
       decoration: InputDecoration(
@@ -56,6 +60,8 @@ class _CustomFormFieldState extends State<CustomFormField> {
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(
+                  // AGORA FUNCIONA: O estado de 'isObscured' é preservado
+                  // e o ícone pode alternar entre os dois estados.
                   isObscured ? Icons.visibility_off : Icons.visibility,
                   color: AppColors.grey,
                 ),
