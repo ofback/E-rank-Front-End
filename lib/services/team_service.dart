@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:erank_app/core/constants/api_constants.dart';
 import 'package:erank_app/services/auth_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart'; // Importe "required"
+//import 'package:flutter/foundation.dart';
 
 class TeamService {
-  // CORREÇÃO: Método adicionado
+  // CORREÇÃO: Método adicionado e alinhado com o DTO do backend
   static Future<bool> createTeam({
     required String name,
     required String description,
@@ -17,14 +17,13 @@ class TeamService {
       return false;
     }
 
-    // A rota para criar um time (geralmente POST no recurso principal)
     final url = Uri.parse('${ApiConstants.baseUrl}/times');
 
-    // Mapeie os nomes da tela para os nomes que o backend espera
     final body = json.encode({
-      'nome': name, // O backend espera 'nome'
-      'descricao': description, // O backend espera 'descricao'
-      'idsMembros': memberIds, // O backend espera 'idsMembros'
+      'nome': name,
+      'descricao': description,
+      // CORREÇÃO FINAL: Chave 'memberIds' para bater com CreateTeamDTO.java
+      'memberIds': memberIds,
     });
 
     try {
@@ -32,13 +31,12 @@ class TeamService {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Padrão que corrigimos
+          'Authorization': 'Bearer $token', // Padrão 'Bearer' correto
         },
         body: body,
       );
 
-      // 201 (Created) é o status padrão para sucesso em um POST
-      // Se sua API retornar 200, mude aqui para response.statusCode == 200
+      // Backend retorna 201 Created (TimesController.java)
       if (response.statusCode == 201) {
         return true;
       } else {
@@ -96,6 +94,7 @@ class TeamService {
         },
       );
 
+      // Backend retorna 204 No Content (TimesController.java)
       if (response.statusCode == 204) {
         return true;
       } else {
