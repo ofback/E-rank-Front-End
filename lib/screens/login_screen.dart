@@ -1,3 +1,4 @@
+// E-rank-Front-End/lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -5,9 +6,11 @@ import 'package:erank_app/screens/signup_screen.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/services/auth_service.dart'; // Importe o serviço
 import 'package:erank_app/widgets/custom_form_field.dart';
-import 'package:erank_app/screens/home_screen.dart';
 import 'package:erank_app/widgets/primary_button.dart';
 import 'package:erank_app/screens/forgot_password_screen.dart';
+
+// --- 1. ADICIONE O IMPORT DA NOVA TELA ---
+import 'package:erank_app/navigation/main_navigator_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -49,8 +52,11 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
 
     if (success) {
+      // --- 2. ESTA É A MUDANÇA IMPORTANTE ---
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        // Antes era: MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(
+            builder: (context) => const MainNavigatorScreen()), // Nova linha
         (Route<dynamic> route) => false,
       );
     } else {
