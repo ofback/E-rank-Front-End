@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:erank_app/screens/signup_screen.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
-import 'package:erank_app/services/auth_service.dart';
+import 'package:erank_app/services/auth_service.dart'; // Importe o serviço
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/screens/home_screen.dart';
 import 'package:erank_app/widgets/primary_button.dart';
@@ -22,7 +22,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  final AuthService _authService = AuthService();
+  // CORREÇÃO: Linha removida. Não precisamos mais de uma instância.
+  // final AuthService _authService = AuthService();
 
   @override
   void dispose() {
@@ -36,7 +37,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    final success = await _authService.login(
+    // CORREÇÃO: Chamando o método "static" diretamente pela classe.
+    final success = await AuthService.login(
       _emailController.text,
       _passwordController.text,
     );
@@ -62,6 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ... (O restante do seu método build permanece o mesmo)
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(

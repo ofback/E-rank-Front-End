@@ -10,7 +10,10 @@ class SocialService {
 
     final response = await http.get(
       Uri.parse('${ApiConstants.baseUrl}/amizades/meus-amigos'),
-      headers: {'Authorization': token},
+      headers: {
+        // CORREÇÃO: Adicionado 'Bearer '
+        'Authorization': 'Bearer $token'
+      },
     );
 
     if (response.statusCode == 200) {
@@ -25,7 +28,10 @@ class SocialService {
 
     final response = await http.get(
       Uri.parse('${ApiConstants.baseUrl}/amizades/convites'),
-      headers: {'Authorization': token},
+      headers: {
+        // CORREÇÃO: Adicionado 'Bearer '
+        'Authorization': 'Bearer $token'
+      },
     );
 
     if (response.statusCode == 200) {
@@ -41,7 +47,8 @@ class SocialService {
     final response = await http.post(
       Uri.parse('${ApiConstants.baseUrl}/amizades'),
       headers: {
-        'Authorization': token,
+        // CORREÇÃO: Adicionado 'Bearer '
+        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
       body: json.encode({
@@ -59,7 +66,8 @@ class SocialService {
     final response = await http.get(
       Uri.parse('${ApiConstants.baseUrl}/usuarios?nickname=$nickname'),
       headers: {
-        'Authorization': token,
+        // CORREÇÃO: Adicionado 'Bearer '
+        'Authorization': 'Bearer $token',
       },
     );
 
@@ -78,7 +86,8 @@ class SocialService {
       // Usando o método PATCH
       Uri.parse('${ApiConstants.baseUrl}/amizades/$friendshipId'),
       headers: {
-        'Authorization': token,
+        // CORREÇÃO: Adicionado 'Bearer '
+        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
       body: json.encode({
@@ -96,7 +105,8 @@ class SocialService {
       // Usando o método DELETE
       Uri.parse('${ApiConstants.baseUrl}/amizades/$friendshipId'),
       headers: {
-        'Authorization': token,
+        // CORREÇÃO: Adicionado 'Bearer '
+        'Authorization': 'Bearer $token',
       },
     );
     return response.statusCode == 204; // No Content
