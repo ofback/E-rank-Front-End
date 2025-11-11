@@ -1,7 +1,11 @@
+// E-rank-Front-End/lib/navigation/auth_wrapper.dart
 import 'package:erank_app/screens/home_screen.dart';
 import 'package:erank_app/screens/login_screen.dart';
 import 'package:erank_app/services/auth_storage.dart';
 import 'package:flutter/material.dart';
+
+// Import da nossa nova tela de navegação
+import 'package:erank_app/navigation/main_navigator_screen.dart';
 
 class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
@@ -32,7 +36,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
         // Se o snapshot tem dado e o valor é true (está logado)
         if (snapshot.hasData && snapshot.data == true) {
-          return const HomeScreen();
+          // --- ESTA É A MUDANÇA IMPORTANTE ---
+          // Antes era: return const HomeScreen();
+          return const MainNavigatorScreen();
         }
 
         // Caso contrário, vai para a tela de Login
