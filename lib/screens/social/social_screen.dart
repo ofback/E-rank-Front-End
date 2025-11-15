@@ -12,6 +12,8 @@ class SocialScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        primary: false,
+        resizeToAvoidBottomInset: false,
         backgroundColor: AppColors.background,
         appBar: AppBar(
           backgroundColor: AppColors.background,

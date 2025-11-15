@@ -1,5 +1,7 @@
+// E-rank-Front-End/lib/screens/home_screen.dart
+import 'package:erank_app/core/theme/app_colors.dart'; // 1. IMPORTAR AppColors
 import 'package:flutter/material.dart';
-import 'package:erank_app/services/team_service.dart'; // Importe o serviço
+import 'package:erank_app/services/team_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,9 +13,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<dynamic>> _myTeamsFuture;
 
-  // CORREÇÃO: Linha removida. Não precisamos mais de uma instância.
-  // final TeamService _teamService = TeamService();
-
   @override
   void initState() {
     super.initState();
@@ -22,7 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadMyTeams() {
     setState(() {
-      // CORREÇÃO: Chamando o método "static" diretamente pela classe.
       _myTeamsFuture = TeamService.getMyTeams();
     });
   }
@@ -30,8 +28,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      primary: false,
+      resizeToAvoidBottomInset: false,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('E-Rank'),
+        // --- 3. CORREÇÃO DA BARRA AMARELA ---
+        // Define a cor da AppBar para combinar com o fundo
+        backgroundColor: AppColors.background,
+        elevation: 0, // Remove a sombra
+        // --------------------------------------
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -48,22 +54,30 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               'Meus Times',
-              style: Theme.of(context).textTheme.headlineSmall,
+              // --- 4. GARANTIR QUE O TEXTO SEJA BRANCO ---
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall
+                  ?.copyWith(color: AppColors.white),
+              // --------------------------------------------
             ),
           ),
           Expanded(
             child: FutureBuilder<List<dynamic>>(
               future: _myTeamsFuture,
               builder: (context, snapshot) {
-                // ... (O restante do seu FutureBuilder permanece o mesmo)
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
-                      child: Text('Erro ao carregar times: ${snapshot.error}'));
+                      child: Text('Erro ao carregar times: ${snapshot.error}',
+                          style: const TextStyle(
+                              color: AppColors.white54))); // Corrigir cor
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(
-                      child: Text('Você ainda não faz parte de um time.'));
+                      child: Text('Você ainda não faz parte de um time.',
+                          style: const TextStyle(
+                              color: AppColors.white54))); // Corrigir cor
                 }
 
                 final myTeams = snapshot.data!;
@@ -78,11 +92,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     final String teamName = team['nome'] ?? 'Nome indisponível';
 
                     return Card(
+                      // --- 5. CORRIGIR COR DO CARD PARA O TEMA ESCURO ---
+                      color: AppColors.white.withOpacity(0.05),
                       margin: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 16),
                       child: ListTile(
-                        title: Text(teamName),
-                        subtitle: Text(team['cargo'] ?? 'Cargo indisponível'),
+                        title: Text(teamName,
+                            style: const TextStyle(
+                                color: AppColors.white)), // Corrigir cor
+                        subtitle: Text(team['cargo'] ?? 'Cargo indisponível',
+                            style: const TextStyle(
+                                color: AppColors.white54)), // Corrigir cor
+                        // ----------------------------------------------------
                         trailing: IconButton(
                           icon:
                               const Icon(Icons.exit_to_app, color: Colors.red),
@@ -120,9 +141,9 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               child: const Text('Sair', style: TextStyle(color: Colors.red)),
               onPressed: () async {
-                // CORREÇÃO: Chamando o método "static" diretamente pela classe.
                 bool success = await TeamService.leaveTeam(teamId);
 
+                if (!context.mounted) return;
                 Navigator.of(context).pop();
 
                 if (success) {

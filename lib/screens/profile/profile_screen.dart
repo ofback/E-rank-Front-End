@@ -27,6 +27,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      primary: false,
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
       body: FutureBuilder<Map<String, dynamic>?>(
         future: UserService.fetchMyProfile(),
