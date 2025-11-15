@@ -13,7 +13,7 @@ class MainNavigatorScreen extends StatefulWidget {
 }
 
 class _MainNavigatorScreenState extends State<MainNavigatorScreen> {
-  int _selectedIndex = 0; // Começa na aba 'Times' (índice 0)
+  int _selectedIndex = 0;
 
   // Lista das telas principais
   static const List<Widget> _widgetOptions = <Widget>[
@@ -31,10 +31,10 @@ class _MainNavigatorScreenState extends State<MainNavigatorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // O body agora é a tela selecionada da lista
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      backgroundColor: AppColors.background,
+
+      // O body está limpo, sem SafeArea ou Center
+      body: _widgetOptions.elementAt(_selectedIndex),
 
       // A barra de navegação inferior
       bottomNavigationBar: BottomNavigationBar(
@@ -56,9 +56,8 @@ class _MainNavigatorScreenState extends State<MainNavigatorScreen> {
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.grey,
         onTap: _onItemTapped,
-        backgroundColor: AppColors.background, // Usa a cor de fundo
-        type: BottomNavigationBarType
-            .fixed, // Garante que todos os itens apareçam
+        backgroundColor: AppColors.background,
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }

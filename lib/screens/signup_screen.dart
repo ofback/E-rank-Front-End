@@ -1,3 +1,4 @@
+// E-rank-Front-End/lib/screens/signup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -7,6 +8,7 @@ import 'package:erank_app/services/auth_service.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/widgets/primary_button.dart';
+import 'package:erank_app/navigation/main_navigator_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -17,6 +19,9 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  final _nomeController = TextEditingController();
+  final _dataNascimentoController = TextEditingController();
   final _nicknameController = TextEditingController();
   final _emailController = TextEditingController();
   final _confirmEmailController = TextEditingController();
@@ -26,12 +31,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final _cpfMask = MaskTextInputFormatter(
       mask: '###.###.###-##', filter: {"#": RegExp(r'[0-9]')});
+  final _dataNascimentoMask = MaskTextInputFormatter(
+      mask: '##/##/####', filter: {"#": RegExp(r'[0-9]')});
 
   bool _isLoading = false;
-  bool _agreeToTerms = false; // Corrigido: Removido 'final'
-  // bool _acceptMarketing = false; // Corrigido: Removido 'final'
+  bool _agreeToTerms = false;
 
   Widget _buildSmallScreenHeader() {
+    // ... (Método inalterado) ...
     return Column(
       children: [
         const SizedBox(height: 40),
@@ -52,6 +59,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void dispose() {
+    _nomeController.dispose();
+    _dataNascimentoController.dispose();
     _nicknameController.dispose();
     _emailController.dispose();
     _confirmEmailController.dispose();
@@ -78,39 +87,60 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     final user = {
-      'nome': _nicknameController.text, // O backend espera 'nome'
+      'nome': _nomeController.text,
       'nickname': _nicknameController.text,
       'email': _emailController.text,
       'senha': _passwordController.text,
-      'cpf': _cpfMask.getUnmaskedText(), // O backend espera 'cpf'
-      'dataNascimento': "01/01/2000", // O backend espera 'dataNascimento'
+      'cpf': _cpfMask.getUnmaskedText(),
+      'dataNascimento': _dataNascimentoController.text,
     };
 
     final success = await AuthService.register(user);
 
+    // 1. PRIMEIRA VERIFICAÇÃO (APÓS O register)
     if (!mounted) return;
 
-    setState(() => _isLoading = false);
-
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            backgroundColor: AppColors.green,
-            content: Text('Usuário cadastrado com sucesso! Faça o login.')),
+      final loginSuccess = await AuthService.login(
+        _emailController.text,
+        _passwordController.text,
       );
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()));
+
+      // --- 2. CORREÇÃO CRÍTICA (APÓS O login) ---
+      //     Adiciona a verificação de 'mounted' DEPOIS do await
+      //     e ANTES de usar o 'context' (no Navigator/ScaffoldMessenger)
+      if (!mounted) return;
+
+      if (loginSuccess) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainNavigatorScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              backgroundColor: AppColors.green,
+              content: Text('Usuário cadastrado! Faça o login.')),
+        );
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()));
+      }
     } else {
+      // (Esta verificação já estava protegida pela primeira)
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             backgroundColor: AppColors.red,
-            content: Text('Erro ao cadastrar. O e-mail já pode existir.')),
+            content:
+                Text('Erro ao cadastrar. O e-mail ou CPF já pode existir.')),
       );
     }
+
+    setState(() => _isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
+    // ... (Build method inicial inalterado) ...
     final screenWidth = MediaQuery.of(context).size.width;
     final isLargeScreen = screenWidth > 800;
 
@@ -119,6 +149,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: SafeArea(
         child: isLargeScreen
             ? Row(
+                // ... (Layout tela grande inalterado) ...
                 children: [
                   Expanded(
                     flex: 1,
@@ -157,14 +188,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      // --- CORREÇÃO DE LAYOUT (TELA GRANDE) ---
-                      // Adicionado SingleChildScrollView e Padding
                       child: SingleChildScrollView(
                         child: Center(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24, vertical: 40),
-                            child: _buildSignUpFormContent(), // Renomeado
+                            child: _buildSignUpFormContent(),
                           ),
                         ),
                       ),
@@ -172,14 +201,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ],
               )
-            // --- LAYOUT DE TELA PEQUENA (JÁ ESTAVA OK) ---
             : LayoutBuilder(
+                // ... (Layout tela pequena inalterado) ...
                 builder: (context, constraints) {
                   return SingleChildScrollView(
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
-                        minHeight:
-                            constraints.maxHeight, // Garante altura mínima
+                        minHeight: constraints.maxHeight,
                       ),
                       child: IntrinsicHeight(
                         child: Column(
@@ -189,11 +217,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 24.0),
-                              // --- CORREÇÃO DE LAYOUT (TELA PEQUENA) ---
-                              child: _buildSignUpFormContent(), // Renomeado
+                              child: _buildSignUpFormContent(),
                             ),
-                            const SizedBox(
-                                height: 40), // Espaço extra no final da rolagem
+                            const SizedBox(height: 40),
                           ],
                         ),
                       ),
@@ -205,13 +231,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  // --- MÉTODO RENOMEADO E CORRIGIDO ---
-  // Removido o SingleChildScrollView interno que causava o conflito
   Widget _buildSignUpFormContent() {
-    // Determina o número de colunas com base na largura da tela
     final screenWidth = MediaQuery.of(context).size.width;
-    final crossAxisCount =
-        screenWidth > 750 ? 2 : 1; // 2 colunas se a tela for larga
+    final crossAxisCount = screenWidth > 750 ? 2 : 1;
+
+    // --- 3. CORREÇÃO CRÍTICA (num/double) ---
+    //     Força os números a serem 'double' (4.0, 5.0)
+    final childAspectRatio =
+        crossAxisCount == 2 ? 4.0 : (screenWidth > 400 ? 5.0 : 4.5);
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 750),
@@ -221,6 +248,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
+                  // Este 'withOpacity' é um dos erros que você reportou.
+                  // Veja a explicação na Seção 2.
                   color: Colors.black.withOpacity(0.2),
                   blurRadius: 10,
                   offset: const Offset(0, 5)),
@@ -230,6 +259,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           key: _formKey,
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            // ... (Header inalterado) ...
             Text('Comece sua jornada',
                 style: GoogleFonts.poppins(
                     fontSize: 24,
@@ -241,22 +271,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     GoogleFonts.poppins(fontSize: 14, color: AppColors.grey)),
             const SizedBox(height: 30),
 
-            // --- NOVO LAYOUT COM GRIDVIEW ---
+            // ... (GridView e campos inalterados) ...
             GridView.count(
               crossAxisCount: crossAxisCount,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisSpacing: 20,
               mainAxisSpacing: 20,
-              childAspectRatio:
-                  4, // Ajuste este valor para mudar a altura dos campos
+              childAspectRatio: childAspectRatio,
               children: [
                 CustomFormField(
+                  controller: _nomeController,
+                  label: 'NOME COMPLETO',
+                  validator:
+                      RequiredValidator(errorText: 'Nome é obrigatório').call,
+                ),
+                CustomFormField(
                   controller: _nicknameController,
-                  label: 'NICKNAME',
+                  label: 'NICKNAME (APELIDO)',
                   validator:
                       RequiredValidator(errorText: 'Nickname é obrigatório')
                           .call,
+                ),
+                CustomFormField(
+                  controller: _dataNascimentoController,
+                  label: 'DATA DE NASCIMENTO',
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [_dataNascimentoMask],
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return 'Data é obrigatória';
+                    }
+                    if (val.length != 10) return 'Data inválida';
+                    return null;
+                  },
                 ),
                 CustomFormField(
                   controller: _cpfController,
@@ -307,9 +355,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ],
             ),
-            // --- FIM DO NOVO LAYOUT ---
 
             const SizedBox(height: 20),
+
             CheckboxListTile(
               title: Text("Eu li e aceito os Termos de Serviço",
                   style: GoogleFonts.poppins(fontSize: 14)),

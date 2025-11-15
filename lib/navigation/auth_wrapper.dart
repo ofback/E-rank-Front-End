@@ -1,5 +1,4 @@
 // E-rank-Front-End/lib/navigation/auth_wrapper.dart
-import 'package:erank_app/screens/home_screen.dart';
 import 'package:erank_app/screens/login_screen.dart';
 import 'package:erank_app/services/auth_storage.dart';
 import 'package:flutter/material.dart';
