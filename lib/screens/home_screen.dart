@@ -1,5 +1,5 @@
 // E-rank-Front-End/lib/screens/home_screen.dart
-import 'package:erank_app/core/theme/app_colors.dart'; // 1. IMPORTAR AppColors
+import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/services/team_service.dart';
 
@@ -33,11 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('E-Rank'),
-        // --- 3. CORREÇÃO DA BARRA AMARELA ---
-        // Define a cor da AppBar para combinar com o fundo
         backgroundColor: AppColors.background,
-        elevation: 0, // Remove a sombra
-        // --------------------------------------
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -54,12 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               'Meus Times',
-              // --- 4. GARANTIR QUE O TEXTO SEJA BRANCO ---
               style: Theme.of(context)
                   .textTheme
                   .headlineSmall
                   ?.copyWith(color: AppColors.white),
-              // --------------------------------------------
             ),
           ),
           Expanded(
@@ -71,13 +66,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else if (snapshot.hasError) {
                   return Center(
                       child: Text('Erro ao carregar times: ${snapshot.error}',
-                          style: const TextStyle(
-                              color: AppColors.white54))); // Corrigir cor
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          style: const TextStyle(color: AppColors.white54)));
+                } else if (!snapshot.hasData ||
+                    snapshot.data == null ||
+                    snapshot.data!.isEmpty) {
                   return const Center(
                       child: Text('Você ainda não faz parte de um time.',
-                          style: const TextStyle(
-                              color: AppColors.white54))); // Corrigir cor
+                          style: const TextStyle(color: AppColors.white54)));
                 }
 
                 final myTeams = snapshot.data!;
@@ -86,30 +81,65 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: myTeams.length,
                   itemBuilder: (context, index) {
                     final team = myTeams[index];
-                    final int teamId = team['id'] is int
-                        ? team['id']
-                        : int.parse(team['id'].toString());
-                    final String teamName = team['nome'] ?? 'Nome indisponível';
+
+                    // --- CORREÇÃO AQUI: Usando as chaves do MyTeamDTO.java ---
+
+                    // 1. 'id' virou 'teamId'
+                    final int teamId =
+                        int.tryParse(team['teamId'].toString()) ?? 0;
+
+                    // 2. 'nome' virou 'teamName'
+                    final String teamName =
+                        team['teamName'] ?? 'Nome indisponível';
+
+                    // 3. 'cargo' virou 'userRole'
+                    final String teamCargo =
+                        team['userRole'] ?? 'Cargo indisponível';
 
                     return Card(
-                      // --- 5. CORRIGIR COR DO CARD PARA O TEMA ESCURO ---
                       color: AppColors.white.withOpacity(0.05),
                       margin: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 16),
-                      child: ListTile(
-                        title: Text(teamName,
-                            style: const TextStyle(
-                                color: AppColors.white)), // Corrigir cor
-                        subtitle: Text(team['cargo'] ?? 'Cargo indisponível',
-                            style: const TextStyle(
-                                color: AppColors.white54)), // Corrigir cor
-                        // ----------------------------------------------------
-                        trailing: IconButton(
-                          icon:
-                              const Icon(Icons.exit_to_app, color: Colors.red),
-                          onPressed: () {
-                            _showLeaveTeamDialog(context, teamId, teamName);
-                          },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 12.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    teamName,
+                                    style: const TextStyle(
+                                      color: AppColors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    teamCargo,
+                                    style: const TextStyle(
+                                      color: AppColors.white54,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.exit_to_app,
+                                  color: Colors.red),
+                              onPressed: () {
+                                if (teamId != 0) {
+                                  _showLeaveTeamDialog(
+                                      context, teamId, teamName);
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     );
