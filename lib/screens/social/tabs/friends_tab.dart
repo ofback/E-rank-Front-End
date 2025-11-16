@@ -97,8 +97,9 @@ class _FriendsTabState extends State<FriendsTab> {
             final friendshipId = friend['friendshipId'];
             final bool isProcessing = _loadingFriendshipId == friendshipId;
 
-            // O DTO do backend (FriendDTO) envia 'friendNickname'
-            final String nickname = friend['friendNickname'] ?? 'Amigo';
+            // --- CORREÇÃO AQUI ---
+            // O DTO do backend (FriendDTO) envia 'nickname'
+            final String nickname = friend['nickname'] ?? 'Amigo';
 
             return Card(
               color: Colors.white.withOpacity(0.05),
@@ -107,7 +108,8 @@ class _FriendsTabState extends State<FriendsTab> {
                 leading: CircleAvatar(
                   backgroundColor: AppColors.primary.withOpacity(0.8),
                   child: Text(
-                    nickname[0].toUpperCase(),
+                    // Lógica para evitar erro se o nickname estiver vazio
+                    nickname.isNotEmpty ? nickname[0].toUpperCase() : '?',
                     style: const TextStyle(color: AppColors.white),
                   ),
                 ),
