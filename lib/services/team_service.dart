@@ -1,3 +1,4 @@
+// E-rank-Front-End/lib/services/team_service.dart
 import 'dart:convert';
 import 'package:erank_app/core/constants/api_constants.dart';
 import 'package:erank_app/services/auth_storage.dart';
@@ -5,7 +6,7 @@ import 'package:http/http.dart' as http;
 //import 'package:flutter/foundation.dart';
 
 class TeamService {
-  // CORREÇÃO: Método adicionado e alinhado com o DTO do backend
+  // Método de criar time (Já estava correto)
   static Future<bool> createTeam({
     required String name,
     required String description,
@@ -22,7 +23,6 @@ class TeamService {
     final body = json.encode({
       'nome': name,
       'descricao': description,
-      // CORREÇÃO FINAL: Chave 'memberIds' para bater com CreateTeamDTO.java
       'memberIds': memberIds,
     });
 
@@ -45,12 +45,13 @@ class TeamService {
         return false;
       }
     } catch (e) {
-      print('Erro de conexão ao tentar criar time: $e');
+      print('Erro em TeamService.createTeam: $e');
       return false;
     }
   }
 
-  // Método que já existia (corrigido para static)
+  // --- CORREÇÃO APLICADA AQUI ---
+  // Método para buscar os times do usuário
   static Future<List<dynamic>> getMyTeams() async {
     final token = await AuthStorage.getToken();
     if (token == null) {
@@ -60,7 +61,7 @@ class TeamService {
     final response = await http.get(
       Uri.parse('${ApiConstants.baseUrl}/times/me'),
       headers: {
-        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/json', // <-- LINHA REMOVIDA
         'Authorization': 'Bearer $token',
       },
     );
@@ -68,14 +69,18 @@ class TeamService {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
+      // Lança exceção para ser capturada pelo FutureBuilder
       throw Exception('Falha ao carregar os times');
     }
   }
 
-  // Método que já existia (corrigido para static)
+  // Método para sair do time (Já estava correto)
   static Future<bool> leaveTeam(int teamId) async {
     final token = await AuthStorage.getToken();
-    final userId = await AuthStorage.getUserId();
+    // Você precisa implementar a lógica para buscar o ID do usuário no AuthStorage
+    // Exemplo:
+    // final userId = await AuthStorage.getUserId();
+    final userId = await AuthStorage.getUserId(); // Assumindo que você tem isso
 
     if (token == null || userId == null) {
       print('Erro: Token ou User ID não encontrados.');
@@ -103,7 +108,7 @@ class TeamService {
         return false;
       }
     } catch (e) {
-      print('Erro de conexão ao tentar sair do time: $e');
+      print('Erro em TeamService.leaveTeam: $e');
       return false;
     }
   }
