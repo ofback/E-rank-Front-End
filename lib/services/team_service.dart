@@ -1,115 +1,98 @@
-// E-rank-Front-End/lib/services/team_service.dart
 import 'dart:convert';
 import 'package:erank_app/core/constants/api_constants.dart';
-import 'package:erank_app/services/auth_storage.dart';
-import 'package:http/http.dart' as http;
-//import 'package:flutter/foundation.dart';
+import 'package:erank_app/services/api_client.dart';
+import 'package:erank_app/models/team_member.dart';
 
 class TeamService {
-  // Método de criar time (Já estava correto)
+  // --- Listar Meus Times ---
+  static Future<List<dynamic>> getMyTeams() async {
+    try {
+      final response = await ApiClient.get('/times/me');
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+    } catch (e) {
+      print('Erro ao buscar times: $e');
+    }
+    return [];
+  }
+
+  // --- Criar Time ---
   static Future<bool> createTeam({
     required String name,
     required String description,
     required List<int> memberIds,
   }) async {
-    final token = await AuthStorage.getToken();
-    if (token == null) {
-      print('Erro: Token não encontrado.');
-      return false;
-    }
-
-    final url = Uri.parse('${ApiConstants.baseUrl}/times');
-
-    final body = json.encode({
+    final body = {
       'nome': name,
       'descricao': description,
       'memberIds': memberIds,
-    });
+    };
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Padrão 'Bearer' correto
-        },
-        body: body,
-      );
-
-      // Backend retorna 201 Created (TimesController.java)
-      if (response.statusCode == 201) {
-        return true;
-      } else {
-        print(
-            'Falha ao criar time. Status: ${response.statusCode} | Body: ${response.body}');
-        return false;
-      }
+      final response = await ApiClient.post('/times', body: body);
+      return response.statusCode == 201;
     } catch (e) {
-      print('Erro em TeamService.createTeam: $e');
+      print('Erro ao criar time: $e');
       return false;
     }
   }
 
-  // --- CORREÇÃO APLICADA AQUI ---
-  // Método para buscar os times do usuário
-  static Future<List<dynamic>> getMyTeams() async {
-    final token = await AuthStorage.getToken();
-    if (token == null) {
-      throw Exception('Token não encontrado');
+  // --- NOVAS FUNÇÕES (RF08 - Gerenciamento de Membros) ---
+
+  // 1. Buscar Membros
+  static Future<List<TeamMember>> getTeamMembers(int teamId) async {
+    try {
+      final response = await ApiClient.get('/times/$teamId/members');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((json) => TeamMember.fromJson(json)).toList();
+      }
+    } catch (e) {
+      print('Erro ao buscar membros: $e');
     }
+    return [];
+  }
 
-    final response = await http.get(
-      Uri.parse('${ApiConstants.baseUrl}/times/me'),
-      headers: {
-        // 'Content-Type': 'application/json', // <-- LINHA REMOVIDA
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      // Lança exceção para ser capturada pelo FutureBuilder
-      throw Exception('Falha ao carregar os times');
+  // 2. Adicionar Membro
+  static Future<bool> addMember(int teamId, int userId) async {
+    try {
+      final response = await ApiClient.post('/times/$teamId/members',
+          body: {'userId': userId});
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Erro ao adicionar membro: $e');
+      return false;
     }
   }
 
-  // Método para sair do time (Já estava correto)
-  static Future<bool> leaveTeam(int teamId) async {
-    final token = await AuthStorage.getToken();
-    // Você precisa implementar a lógica para buscar o ID do usuário no AuthStorage
-    // Exemplo:
-    // final userId = await AuthStorage.getUserId();
-    final userId = await AuthStorage.getUserId(); // Assumindo que você tem isso
-
-    if (token == null || userId == null) {
-      print('Erro: Token ou User ID não encontrados.');
-      return false;
-    }
-
-    final url =
-        Uri.parse('${ApiConstants.baseUrl}/times/$teamId/members/$userId');
-
+  // 3. Alterar Cargo (Promover/Rebaixar)
+  static Future<bool> updateRole(int teamId, int userId, String newRole) async {
     try {
-      final response = await http.delete(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      // Backend retorna 204 No Content (TimesController.java)
-      if (response.statusCode == 204) {
-        return true;
-      } else {
-        print('Falha ao sair do time. Status: ${response.statusCode}');
-        print('Corpo da resposta: ${response.body}');
-        return false;
-      }
+      final response = await ApiClient.patch(
+          '/times/$teamId/members/$userId/role',
+          body: {'novoCargo': newRole});
+      return response.statusCode == 200;
     } catch (e) {
-      print('Erro em TeamService.leaveTeam: $e');
+      print('Erro ao atualizar cargo: $e');
       return false;
     }
+  }
+
+  // 4. Remover Membro (Sair ou Expulsar)
+  static Future<bool> removeMember(int teamId, int userId) async {
+    try {
+      final response = await ApiClient.delete('/times/$teamId/members/$userId');
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      print('Erro ao remover membro: $e');
+      return false;
+    }
+  }
+
+  // Wrapper para compatibilidade
+  static Future<bool> leaveTeam(int teamId, int userId) async {
+    return removeMember(teamId, userId);
   }
 }
