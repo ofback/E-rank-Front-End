@@ -1,7 +1,9 @@
-// E-rank-Front-End/lib/screens/home_screen.dart
 import 'package:erank_app/core/theme/app_colors.dart';
+import 'package:erank_app/screens/teams/team_details_screen.dart'; // Importante!
 import 'package:flutter/material.dart';
 import 'package:erank_app/services/team_service.dart';
+import 'package:erank_app/services/auth_storage.dart'; // Necessário para pegar o ID do usuário ao sair
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              // Lógica de logout aqui
+              // Implemente seu logout aqui
             },
           ),
         ],
@@ -72,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     snapshot.data!.isEmpty) {
                   return const Center(
                       child: Text('Você ainda não faz parte de um time.',
-                          style: const TextStyle(color: AppColors.white54)));
+                          style: TextStyle(color: AppColors.white54)));
                 }
 
                 final myTeams = snapshot.data!;
@@ -82,64 +84,81 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     final team = myTeams[index];
 
-                    // --- CORREÇÃO AQUI: Usando as chaves do MyTeamDTO.java ---
-
-                    // 1. 'id' virou 'teamId'
-                    final int teamId =
-                        int.tryParse(team['teamId'].toString()) ?? 0;
-
-                    // 2. 'nome' virou 'teamName'
-                    final String teamName =
-                        team['teamName'] ?? 'Nome indisponível';
-
-                    // 3. 'cargo' virou 'userRole'
-                    final String teamCargo =
-                        team['userRole'] ?? 'Cargo indisponível';
+                    // --- CHAVES CORRIGIDAS (Java DTO padrão) ---
+                    final int teamId = team['id'] ?? 0;
+                    final String teamName = team['nome'] ?? 'Sem Nome';
+                    final String teamCargo = team['cargo'] ?? 'Membro';
+                    final String teamStatus = team['status'] ?? 'P';
 
                     return Card(
-                      color: AppColors.white.withOpacity(0.05),
+                      color: AppColors.surface, // Usando cor do tema
                       margin: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 16),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 12.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    teamName,
-                                    style: const TextStyle(
-                                      color: AppColors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+
+                      // --- HABILITA O CLIQUE ---
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TeamDetailsScreen(team: team),
+                            ),
+                          ).then((_) =>
+                              _loadMyTeams()); // Recarrega ao voltar (caso tenha saído)
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 12.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      teamName,
+                                      style: GoogleFonts.inter(
+                                        color: AppColors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    teamCargo,
-                                    style: const TextStyle(
-                                      color: AppColors.white54,
-                                      fontSize: 14,
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Cargo: $teamCargo',
+                                      style: const TextStyle(
+                                          color: AppColors
+                                              .primary, // Destaca o cargo
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600),
                                     ),
-                                  ),
-                                ],
+                                    Text(
+                                      'Status: ${teamStatus == 'A' ? 'Ativo' : 'Pendente'}',
+                                      style: const TextStyle(
+                                        color: AppColors.white54,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.exit_to_app,
-                                  color: Colors.red),
-                              onPressed: () {
-                                if (teamId != 0) {
-                                  _showLeaveTeamDialog(
-                                      context, teamId, teamName);
-                                }
-                              },
-                            ),
-                          ],
+                              IconButton(
+                                icon: const Icon(Icons.exit_to_app,
+                                    color: Colors.red),
+                                onPressed: () {
+                                  if (teamId != 0) {
+                                    _showLeaveTeamDialog(
+                                        context, teamId, teamName);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -158,9 +177,11 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Sair do Time'),
-          content:
-              Text('Você tem certeza que deseja sair do time "$teamName"?'),
+          backgroundColor: AppColors.surface,
+          title:
+              const Text('Sair do Time', style: TextStyle(color: Colors.white)),
+          content: Text('Você tem certeza que deseja sair do time "$teamName"?',
+              style: const TextStyle(color: Colors.white70)),
           actions: <Widget>[
             TextButton(
               child: const Text('Cancelar'),
@@ -171,7 +192,11 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               child: const Text('Sair', style: TextStyle(color: Colors.red)),
               onPressed: () async {
-                bool success = await TeamService.leaveTeam(teamId);
+                // Busca o ID do usuário logado para passar ao endpoint
+                final userId = await AuthStorage.getUserId();
+                if (userId == null) return;
+
+                bool success = await TeamService.removeMember(teamId, userId);
 
                 if (!context.mounted) return;
                 Navigator.of(context).pop();
