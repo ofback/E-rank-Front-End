@@ -1,47 +1,43 @@
-// E-rank-Front-End/lib/services/auth_service.dart
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:erank_app/core/constants/api_constants.dart';
+import 'package:erank_app/services/api_client.dart';
 import 'package:erank_app/services/auth_storage.dart';
 
 class AuthService {
-  // --- FUNÇÃO DE REGISTO CORRIGIDA ---
+  // REGISTRO
   static Future<bool> register(Map<String, String> user) async {
-    final url = Uri.parse('${ApiConstants.baseUrl}/usuarios');
     try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(user),
-      );
+      // Usa o ApiClient (URL base já está configurada lá)
+      final response = await ApiClient.post('/usuarios', body: user);
 
-      // 1. CORREÇÃO: Mudar a verificação de 200 para 201 (CREATED)
-      //    O Spring retorna 201 para @PostMapping com @ResponseStatus(HttpStatus.CREATED)
+      // Backend retorna 201 Created
       return response.statusCode == 201;
-      //    (Alternativa mais robusta: return response.statusCode >= 200 && response.statusCode < 300;)
     } catch (e) {
       print('Erro no AuthService.register: $e');
       return false;
     }
   }
 
-  // --- FUNÇÃO DE LOGIN (JÁ ESTAVA CORRETA, MAS MANTIDA) ---
+  // LOGIN
   static Future<bool> login(String email, String password) async {
-    // A URL '/login' está correta de acordo com o SecurityConfig
-    final url = Uri.parse('${ApiConstants.baseUrl}/login');
     try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'senha': password}),
-      );
+      final response = await ApiClient.post('/login',
+          body: {'email': email, 'senha': password});
 
       if (response.statusCode == 200) {
-        final responseBody = jsonDecode(response.body);
-        final token = responseBody['token'];
+        final data = jsonDecode(response.body);
+
+        // Extrai dados do DTO (LoginResponseDTO)
+        final token = data['token'];
+        final usuario = data['usuario']; // Objeto usuário dentro da resposta
 
         if (token != null) {
           await AuthStorage.saveToken(token);
+
+          // Salva o ID do usuário para validações futuras (RF08)
+          if (usuario != null && usuario['id'] != null) {
+            await AuthStorage.saveUserId(usuario['id']);
+          }
+
           return true;
         }
       }
@@ -52,8 +48,8 @@ class AuthService {
     }
   }
 
-  // --- FUNÇÃO DE LOGOUT (JÁ ESTAVA CORRETA) ---
+  // LOGOUT
   static Future<void> logout() async {
-    await AuthStorage.deleteToken();
+    await AuthStorage.logout();
   }
 }
