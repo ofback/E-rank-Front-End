@@ -14,23 +14,18 @@ class TeamDetailsScreen extends StatefulWidget {
 }
 
 class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
-  // Removemos o 'late' para evitar o crash se falhar a inicialização
-  Future<List<TeamMember>>? _membersFuture;
+  Future<List<TeamMember>>? _membersFuture; // Removido 'late' para evitar crash
   int? _currentUserId;
 
   @override
   void initState() {
     super.initState();
-    _initializeData();
+    _initialize();
   }
 
-  void _initializeData() {
-    // 1. Inicia a busca dos membros IMEDIATAMENTE (não pode ser null aqui)
-    // Usamos o operador `?? 0` para garantir que se o ID vier nulo, não quebre (envia 0 e retorna vazio)
+  void _initialize() {
     final int teamId = widget.team['id'] ?? 0;
     _membersFuture = TeamService.getTeamMembers(teamId);
-
-    // 2. Carrega o ID do usuário em paralelo
     _loadUserId();
   }
 
@@ -43,11 +38,9 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
     }
   }
 
-  // Para recarregar a lista (ex: após expulsar alguém)
-  void _refreshMembers() {
+  void _refresh() {
     setState(() {
-      final int teamId = widget.team['id'] ?? 0;
-      _membersFuture = TeamService.getTeamMembers(teamId);
+      _membersFuture = TeamService.getTeamMembers(widget.team['id'] ?? 0);
     });
   }
 
@@ -71,20 +64,19 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
                 }
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(
-                      child: Text("Nenhum membro encontrado.",
+                      child: Text("Sem membros.",
                           style: TextStyle(color: Colors.white)));
                 }
 
                 final members = snapshot.data!;
-
-                // Encontra meu perfil na lista para saber permissões (seguro contra nulos)
-                final myMemberProfile = members.firstWhere(
+                final myProfile = members.firstWhere(
                     (m) => m.userId == _currentUserId,
                     orElse: () => TeamMember(
                         userId: -1,
                         nickname: '',
-                        cargo: 'Membro',
-                        dataEntrada: ''));
+                        cargo: '',
+                        dataEntrada: '',
+                        status: ''));
 
                 return ListView.separated(
                   padding: const EdgeInsets.all(16),
@@ -94,7 +86,6 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
                   itemBuilder: (context, index) {
                     final member = members[index];
                     return ListTile(
-                      contentPadding: EdgeInsets.zero,
                       leading: CircleAvatar(
                         backgroundColor: AppColors.primary,
                         child: Text(member.nickname.isNotEmpty
@@ -102,17 +93,20 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
                             : '?'),
                       ),
                       title: Text(member.nickname,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold)),
-                      subtitle: Text(member.cargo,
                           style: TextStyle(
-                              color: member.isDono
-                                  ? Colors.amber
-                                  : (member.isVice
-                                      ? Colors.blueAccent
-                                      : Colors.grey))),
-                      trailing: _buildActionButtons(member, myMemberProfile),
+                              color: member.isPendente
+                                  ? Colors.white54
+                                  : Colors.white,
+                              fontWeight: FontWeight.bold)),
+                      subtitle: Text(
+                          member.isPendente ? "Convite Pendente" : member.cargo,
+                          style: TextStyle(
+                              color: member.isPendente
+                                  ? Colors.orange
+                                  : (member.isDono
+                                      ? Colors.amber
+                                      : Colors.blueAccent))),
+                      trailing: _buildActionButtons(member, myProfile),
                     );
                   },
                 );
@@ -133,41 +127,32 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
     return PopupMenuButton<String>(
       icon: const Icon(Icons.more_vert, color: Colors.white),
       onSelected: (value) {
-        if (value == 'promote') _promoteMember(target);
-        if (value == 'kick') _kickMember(target);
+        if (value == 'promote') _promote(target);
+        if (value == 'kick') _kick(target);
       },
       itemBuilder: (context) => [
-        if (me.isDono && target.isMembro)
+        if (me.isDono && target.isMembro && !target.isPendente)
           const PopupMenuItem(value: 'promote', child: Text('Promover a Vice')),
         if (me.isDono && target.isVice)
           const PopupMenuItem(
               value: 'promote', child: Text('Rebaixar a Membro')),
         if (me.isDono || (me.isVice && target.isMembro))
-          const PopupMenuItem(value: 'kick', child: Text('Remover do Time')),
+          const PopupMenuItem(value: 'kick', child: Text('Remover')),
       ],
     );
   }
 
-  void _promoteMember(TeamMember member) async {
+  void _promote(TeamMember member) async {
     final newRole = member.isMembro ? 'ViceLider' : 'Membro';
-    final success =
-        await TeamService.updateRole(widget.team['id'], member.userId, newRole);
-    if (success) {
-      _refreshMembers();
-      if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Cargo atualizado!")));
+    if (await TeamService.updateRole(
+        widget.team['id'], member.userId, newRole)) {
+      _refresh();
     }
   }
 
-  void _kickMember(TeamMember member) async {
-    final success =
-        await TeamService.removeMember(widget.team['id'], member.userId);
-    if (success) {
-      _refreshMembers();
-      if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Membro removido.")));
+  void _kick(TeamMember member) async {
+    if (await TeamService.removeMember(widget.team['id'], member.userId)) {
+      _refresh();
     }
   }
 
@@ -177,19 +162,14 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Adicionar Membro',
+        title: const Text('Adicionar Membro (ID)',
             style: TextStyle(color: Colors.white)),
         content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'ID do Usuário',
-            hintStyle: TextStyle(color: Colors.white54),
-            enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white)),
-          ),
-        ),
+            controller: controller,
+            keyboardType: TextInputType.number,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+                hintText: 'ID', hintStyle: TextStyle(color: Colors.white54))),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -199,22 +179,11 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
               final id = int.tryParse(controller.text);
               if (id != null) {
                 Navigator.pop(ctx);
-                final success =
-                    await TeamService.addMember(widget.team['id'], id);
-                if (success) {
-                  _refreshMembers();
-                  if (mounted)
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Membro adicionado!")));
-                } else {
-                  if (mounted)
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Erro ao adicionar.")));
-                }
+                await TeamService.addMember(widget.team['id'], id);
+                _refresh();
               }
             },
-            child: const Text('Adicionar',
-                style: TextStyle(color: AppColors.primary)),
+            child: const Text('Adicionar'),
           ),
         ],
       ),

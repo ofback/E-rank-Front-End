@@ -1,14 +1,16 @@
 class TeamMember {
   final int userId;
   final String nickname;
-  final String cargo; // "Dono", "ViceLider", "Membro"
+  final String cargo;
   final String dataEntrada;
+  final String status;
 
   TeamMember({
     required this.userId,
     required this.nickname,
     required this.cargo,
     required this.dataEntrada,
+    required this.status,
   });
 
   factory TeamMember.fromJson(Map<String, dynamic> json) {
@@ -17,11 +19,12 @@ class TeamMember {
       nickname: json['nickname'] ?? 'Desconhecido',
       cargo: json['cargo'] ?? 'Membro',
       dataEntrada: json['dataEntrada'] ?? '',
+      status: json['status'] ?? 'P',
     );
   }
 
-  // Helpers para facilitar a verificação de permissões na tela
   bool get isDono => cargo == 'Dono';
   bool get isVice => cargo == 'ViceLider';
   bool get isMembro => cargo == 'Membro';
+  bool get isPendente => status == 'P';
 }
