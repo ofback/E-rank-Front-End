@@ -4,7 +4,7 @@ import 'package:erank_app/core/constants/api_constants.dart';
 import 'package:erank_app/services/auth_storage.dart';
 
 class ApiClient {
-  static final String _baseUrl = ApiConstants.baseUrl;
+  static const String _baseUrl = ApiConstants.baseUrl;
 
   static Future<Map<String, String>> _getHeaders() async {
     final token = await AuthStorage.getToken();
@@ -43,7 +43,6 @@ class ApiClient {
     );
   }
 
-  // --- ADICIONADO AGORA ---
   static Future<http.Response> patch(String endpoint,
       {Map<String, dynamic>? body}) async {
     final url = Uri.parse('$_baseUrl$endpoint');
@@ -54,7 +53,6 @@ class ApiClient {
       body: body != null ? jsonEncode(body) : null,
     );
   }
-  // ------------------------
 
   static Future<http.Response> delete(String endpoint) async {
     final url = Uri.parse('$_baseUrl$endpoint');
