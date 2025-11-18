@@ -55,7 +55,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           content: Text('Perfil atualizado com sucesso!'),
         ),
       );
-      // Retorna para a tela anterior (ProfileScreen)
       Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -81,15 +80,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // --- CORREÇÃO 1: Adicionado icon ---
             CustomFormField(
               controller: _nicknameController,
               label: 'Nickname',
+              icon: Icons.person, // Obrigatório
             ),
             const SizedBox(height: 20),
+
+            // --- CORREÇÃO 2: Adicionado icon e maxLines ---
             CustomFormField(
               controller: _biografiaController,
               label: 'Biografia',
+              icon: Icons.description, // Obrigatório
+              maxLines: 3, // Melhor para biografia
             ),
+
             const SizedBox(height: 40),
             PrimaryButton(
               text: 'SALVAR ALTERAÇÕES',

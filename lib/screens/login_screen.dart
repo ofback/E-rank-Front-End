@@ -1,15 +1,12 @@
-// E-rank-Front-End/lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:erank_app/screens/signup_screen.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
-import 'package:erank_app/services/auth_service.dart'; // Importe o serviço
+import 'package:erank_app/services/auth_service.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/widgets/primary_button.dart';
 import 'package:erank_app/screens/forgot_password_screen.dart';
-
-// --- 1. ADICIONE O IMPORT DA NOVA TELA ---
 import 'package:erank_app/navigation/main_navigator_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -25,9 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  // CORREÇÃO: Linha removida. Não precisamos mais de uma instância.
-  // final AuthService _authService = AuthService();
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -40,23 +34,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    // CORREÇÃO: Chamando o método "static" diretamente pela classe.
     final success = await AuthService.login(
       _emailController.text,
       _passwordController.text,
     );
 
-    // Verifique se o widget ainda está na árvore de widgets antes de atualizar o estado
     if (!mounted) return;
 
     setState(() => _isLoading = false);
 
     if (success) {
-      // --- 2. ESTA É A MUDANÇA IMPORTANTE ---
       Navigator.of(context).pushAndRemoveUntil(
-        // Antes era: MaterialPageRoute(builder: (context) => const HomeScreen()),
-        MaterialPageRoute(
-            builder: (context) => const MainNavigatorScreen()), // Nova linha
+        MaterialPageRoute(builder: (context) => const MainNavigatorScreen()),
         (Route<dynamic> route) => false,
       );
     } else {
@@ -70,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ... (O restante do seu método build permanece o mesmo)
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -93,9 +81,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: AppColors.white,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 40),
+
+                    // --- CORREÇÃO 1: Adicionado icon ---
                     CustomFormField(
                       controller: _emailController,
                       label: 'E-mail',
+                      icon: Icons.email, // Ícone obrigatório
                       keyboardType: TextInputType.emailAddress,
                       validator: MultiValidator([
                         RequiredValidator(errorText: 'E-mail é obrigatório'),
@@ -103,14 +94,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       ]).call,
                     ),
                     const SizedBox(height: 20),
+
+                    // --- CORREÇÃO 2: Adicionado icon e mudado obscureText para isPassword ---
                     CustomFormField(
                       controller: _passwordController,
                       label: 'Senha',
-                      obscureText: true,
+                      icon: Icons.lock, // Ícone obrigatório
+                      isPassword: true, // Nome atualizado
                       validator:
                           RequiredValidator(errorText: 'Senha é obrigatória')
                               .call,
                     ),
+
                     const SizedBox(height: 40),
                     PrimaryButton(
                       text: 'LOGIN',

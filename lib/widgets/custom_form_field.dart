@@ -3,21 +3,27 @@ import 'package:flutter/services.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
 
 class CustomFormField extends StatefulWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String label;
+  final IconData
+      icon; // Adicionado para manter compatibilidade com seu design anterior
   final String? Function(String?)? validator;
-  final bool obscureText;
-  final TextInputType keyboardType;
+  final bool
+      isPassword; // Renomeado de obscureText para clareza (padrão anterior)
+  final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
+  final int? maxLines;
 
   const CustomFormField({
     super.key,
-    required this.controller,
     required this.label,
+    required this.icon,
+    this.controller,
     this.validator,
-    this.obscureText = false,
-    this.keyboardType = TextInputType.text,
+    this.isPassword = false,
+    this.keyboardType,
     this.inputFormatters,
+    this.maxLines = 1,
   });
 
   @override
@@ -25,55 +31,83 @@ class CustomFormField extends StatefulWidget {
 }
 
 class _CustomFormFieldState extends State<CustomFormField> {
-  // CORREÇÃO 1: A variável de estado é movida para aqui (fora do 'build').
-  // Assim, o seu valor é preservado quando o 'setState' é chamado.
-  bool isObscured = true;
+  // Controla a visibilidade da senha internamente
+  bool _isObscured = true;
 
   @override
   Widget build(BuildContext context) {
-    // CORREÇÃO 2: A variável 'isDarkMode' foi removida pois não estava
-    // a ser usada em lado nenhum.
-    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Rótulo acima do campo
+        Text(
+          widget.label,
+          style: const TextStyle(
+            color: AppColors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            letterSpacing: 1.0,
+          ),
+        ),
+        const SizedBox(height: 8),
 
-    return TextFormField(
-      controller: widget.controller,
-      // A lógica do obscureText agora usa a variável de estado 'isObscured'
-      obscureText: widget.obscureText ? isObscured : false,
-      keyboardType: widget.keyboardType,
-      inputFormatters: widget.inputFormatters,
-      decoration: InputDecoration(
-        labelText: widget.label,
-        labelStyle: const TextStyle(
-          color: AppColors.greyShade600, // Usar uma cor consistente
+        Container(
+          decoration: BoxDecoration(
+            // Fundo escuro translúcido para destacar o campo do background da tela
+            // ignore: deprecated_member_use
+            color: AppColors.black87.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: TextFormField(
+            controller: widget.controller,
+            validator: widget.validator,
+            keyboardType: widget.keyboardType,
+            inputFormatters: widget.inputFormatters,
+            maxLines: widget.isPassword ? 1 : widget.maxLines,
+
+            // Lógica: Se não for campo de senha, nunca obscurece.
+            // Se for senha, obedece a variável de estado _isObscured.
+            obscureText: widget.isPassword ? _isObscured : false,
+
+            // --- ESTILO DO TEXTO DIGITADO (Correção de Visibilidade) ---
+            style: const TextStyle(
+              color: Colors.white, // Texto BRANCO para contraste máximo
+              fontWeight: FontWeight.w600, // Semi-negrito para legibilidade
+              fontSize: 16,
+              letterSpacing: 0.5,
+            ),
+            cursorColor: AppColors.primary,
+
+            decoration: InputDecoration(
+              prefixIcon: Icon(widget.icon, color: AppColors.white54),
+              border: InputBorder.none,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+
+              // Ícone de Olho (Apenas se for senha)
+              suffixIcon: widget.isPassword
+                  ? IconButton(
+                      icon: Icon(
+                        _isObscured ? Icons.visibility_off : Icons.visibility,
+                        color: AppColors.white54,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscured = !_isObscured;
+                        });
+                      },
+                    )
+                  : null,
+
+              errorStyle: const TextStyle(
+                color: AppColors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
-        filled: true,
-        fillColor: Colors.grey.shade100, // Um cinza claro padrão
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.primary),
-        ),
-        errorStyle: const TextStyle(color: AppColors.red),
-        suffixIcon: widget.obscureText
-            ? IconButton(
-                icon: Icon(
-                  // AGORA FUNCIONA: O estado de 'isObscured' é preservado
-                  // e o ícone pode alternar entre os dois estados.
-                  isObscured ? Icons.visibility_off : Icons.visibility,
-                  color: AppColors.grey,
-                ),
-                onPressed: () {
-                  setState(() {
-                    isObscured = !isObscured;
-                  });
-                },
-              )
-            : null,
-      ),
-      validator: widget.validator,
+      ],
     );
   }
 }

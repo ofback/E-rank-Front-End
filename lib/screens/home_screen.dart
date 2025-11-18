@@ -9,7 +9,7 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -40,7 +40,10 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {},
+            onPressed: () async {
+              await AuthStorage.logout();
+              // Adicione navegação para login se necessário
+            },
           ),
         ],
       ),
@@ -75,7 +78,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: myTeams.length,
                   itemBuilder: (context, index) {
                     final team = myTeams[index];
-                    // Como corrigimos o DTO Java, as chaves agora vêm corretas ('id', 'nome')
                     final int teamId = team['id'] ?? 0;
                     final String teamName = team['nome'] ?? 'Sem Nome';
                     final String teamCargo = team['cargo'] ?? 'Membro';
@@ -123,7 +125,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ),
                                   ),
-                                  // Botão Sair (só aparece se já aceitou)
                                   if (teamStatus == 'A')
                                     IconButton(
                                       icon: const Icon(Icons.exit_to_app,
@@ -145,7 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ] else ...[
-                                // ÁREA DE CONVITE PENDENTE
                                 const Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text('Convite Pendente',

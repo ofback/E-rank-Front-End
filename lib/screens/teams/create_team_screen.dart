@@ -102,14 +102,17 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
                 ),
               ),
               const SizedBox(height: 40),
+              // CORRIGIDO: Adicionado 'icon'
               CustomFormField(
                 controller: _teamNameController,
                 label: 'Nome do Time',
+                icon: Icons.group,
                 validator:
                     RequiredValidator(errorText: 'O nome do time é obrigatório')
                         .call,
               ),
               const SizedBox(height: 20),
+              // Este é o TextFormField padrão, então ele não precisava do ícone.
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 4,
@@ -138,7 +141,6 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
               ),
               const SizedBox(height: 40),
 
-              // --- SEÇÃO DE CONVIDAR AMIGOS ---
               _buildFriendsInviteSection(),
 
               const SizedBox(height: 40),
@@ -168,8 +170,9 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
         ),
         const SizedBox(height: 8),
         Container(
-          height: 200, // Altura fixa para a lista de amigos
+          height: 200,
           decoration: BoxDecoration(
+            // ignore: deprecated_member_use
             color: Colors.white.withOpacity(0.05),
             borderRadius: BorderRadius.circular(8),
           ),
