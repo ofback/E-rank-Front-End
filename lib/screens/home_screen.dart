@@ -1,5 +1,6 @@
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/screens/teams/team_details_screen.dart';
+// REMOVIDO: import 'package:erank_app/services/api_client.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/services/team_service.dart';
 import 'package:erank_app/services/auth_storage.dart';
@@ -27,6 +28,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Helper para mostrar erros
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await AuthStorage.logout();
-              // Adicione navegação para login se necessário
             },
           ),
         ],
@@ -159,9 +167,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.green),
                                         onPressed: () async {
-                                          await TeamService.respondInvite(
-                                              teamId, true);
-                                          _loadMyTeams();
+                                          try {
+                                            await TeamService.respondInvite(
+                                                teamId, true);
+                                            _loadMyTeams();
+                                          } catch (e) {
+                                            _showError(e.toString());
+                                          }
                                         },
                                         child: const Text("Aceitar",
                                             style:
@@ -175,9 +187,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                             side: const BorderSide(
                                                 color: Colors.red)),
                                         onPressed: () async {
-                                          await TeamService.respondInvite(
-                                              teamId, false);
-                                          _loadMyTeams();
+                                          try {
+                                            await TeamService.respondInvite(
+                                                teamId, false);
+                                            _loadMyTeams();
+                                          } catch (e) {
+                                            _showError(e.toString());
+                                          }
                                         },
                                         child: const Text("Recusar",
                                             style:
@@ -205,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showLeaveTeamDialog(BuildContext context, int teamId, String teamName) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.surface,
           title:
@@ -215,17 +231,32 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: <Widget>[
             TextButton(
               child: const Text('Cancelar'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             TextButton(
               child: const Text('Sair', style: TextStyle(color: Colors.red)),
               onPressed: () async {
                 final userId = await AuthStorage.getUserId();
                 if (userId == null) return;
-                bool success = await TeamService.removeMember(teamId, userId);
-                if (!context.mounted) return;
-                Navigator.of(context).pop();
-                if (success) _loadMyTeams();
+
+                try {
+                  await TeamService.removeMember(teamId, userId);
+                  // Verifica se o contexto do DIÁLOGO ainda é válido antes de fechar
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop();
+                  }
+                  // Recarrega a lista na tela principal
+                  _loadMyTeams();
+                } catch (e) {
+                  // Se der erro, fecha o diálogo primeiro
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop();
+                  }
+                  // Depois mostra o erro usando o contexto da TELA (se montada)
+                  if (mounted) {
+                    _showError('Erro ao sair do time: $e');
+                  }
+                }
               },
             ),
           ],
