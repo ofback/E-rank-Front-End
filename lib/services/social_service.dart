@@ -1,114 +1,83 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:erank_app/core/constants/api_constants.dart';
-import 'package:erank_app/services/auth_storage.dart';
+import 'package:erank_app/services/api_client.dart';
 
 class SocialService {
+  // --- Buscar Meus Amigos ---
   static Future<List<dynamic>> getMyFriends() async {
-    final token = await AuthStorage.getToken();
-    if (token == null) return [];
-
-    final response = await http.get(
-      Uri.parse('${ApiConstants.baseUrl}/amizades/meus-amigos'),
-      headers: {
-        // CORREÇÃO: Adicionado 'Bearer '
-        'Authorization': 'Bearer $token'
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body) as List<dynamic>;
+    try {
+      final response = await ApiClient.get('/amizades/meus-amigos');
+      final data = ApiClient.handleResponse(response);
+      return data as List<dynamic>;
+    } catch (e) {
+      return [];
     }
-    return [];
   }
 
+  // --- Buscar Convites Pendentes ---
   static Future<List<dynamic>> getFriendRequests() async {
-    final token = await AuthStorage.getToken();
-    if (token == null) return [];
-
-    final response = await http.get(
-      Uri.parse('${ApiConstants.baseUrl}/amizades/convites'),
-      headers: {
-        // CORREÇÃO: Adicionado 'Bearer '
-        'Authorization': 'Bearer $token'
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body) as List<dynamic>;
+    try {
+      final response = await ApiClient.get('/amizades/convites');
+      final data = ApiClient.handleResponse(response);
+      return data as List<dynamic>;
+    } catch (e) {
+      return [];
     }
-    return [];
   }
 
+  // --- Enviar Pedido de Amizade ---
   static Future<bool> sendFriendRequest(int receiverId) async {
-    final token = await AuthStorage.getToken();
-    if (token == null) return false;
-
-    final response = await http.post(
-      Uri.parse('${ApiConstants.baseUrl}/amizades'),
-      headers: {
-        // CORREÇÃO: Adicionado 'Bearer '
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'idUsuario2': receiverId,
-      }),
-    );
-
-    return response.statusCode == 201; // Created
-  }
-
-  static Future<List<dynamic>> searchUsers(String nickname) async {
-    final token = await AuthStorage.getToken();
-    if (token == null || nickname.isEmpty) return [];
-
-    final response = await http.get(
-      Uri.parse('${ApiConstants.baseUrl}/usuarios?nickname=$nickname'),
-      headers: {
-        // CORREÇÃO: Adicionado 'Bearer '
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body) as List<dynamic>;
+    try {
+      // O endpoint espera { "idAmigo": ... } ou { "idUsuario2": ... } ?
+      // Baseado no seu código anterior era 'idUsuario2', mas verifique se o DTO do backend bate.
+      // Vou manter 'idUsuario2' conforme seu código original.
+      final response = await ApiClient.post(
+        '/amizades',
+        body: {'idUsuario2': receiverId},
+      );
+      ApiClient.handleResponse(response);
+      return true;
+    } catch (e) {
+      return false;
     }
-
-    return [];
   }
 
+  // --- Pesquisar Usuários ---
+  static Future<List<dynamic>> searchUsers(String nickname) async {
+    if (nickname.isEmpty) return [];
+
+    try {
+      final response = await ApiClient.get('/usuarios?nickname=$nickname');
+      final data = ApiClient.handleResponse(response);
+      return data as List<dynamic>;
+    } catch (e) {
+      // Se der 404 (não encontrado) ou outro erro, retornamos lista vazia
+      // para a tela exibir "Nenhum usuário encontrado".
+      return [];
+    }
+  }
+
+  // --- Aceitar Pedido ---
   static Future<bool> acceptFriendRequest(int friendshipId) async {
-    final token = await AuthStorage.getToken();
-    if (token == null) return false;
-
-    final response = await http.patch(
-      // Usando o método PATCH
-      Uri.parse('${ApiConstants.baseUrl}/amizades/$friendshipId'),
-      headers: {
-        // CORREÇÃO: Adicionado 'Bearer '
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'status': 'A', // Enviando 'A' de Aceito
-      }),
-    );
-    return response.statusCode == 200; // OK
+    try {
+      final response = await ApiClient.patch(
+        '/amizades/$friendshipId',
+        body: {'status': 'A'},
+      );
+      ApiClient.handleResponse(response);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
+  // --- Recusar ou Remover Amigo ---
   static Future<bool> declineOrRemoveFriendship(int friendshipId) async {
-    final token = await AuthStorage.getToken();
-    if (token == null) return false;
-
-    final response = await http.delete(
-      // Usando o método DELETE
-      Uri.parse('${ApiConstants.baseUrl}/amizades/$friendshipId'),
-      headers: {
-        // CORREÇÃO: Adicionado 'Bearer '
-        'Authorization': 'Bearer $token',
-      },
-    );
-    return response.statusCode == 204; // No Content
+    try {
+      final response = await ApiClient.delete('/amizades/$friendshipId');
+      // 204 No Content é tratado como sucesso no handleResponse (retorna map vazio)
+      ApiClient.handleResponse(response);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
