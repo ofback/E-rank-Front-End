@@ -14,6 +14,7 @@ class _SearchTabState extends State<SearchTab> {
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
+  bool _hasSearched = false; // Variável para controlar se a busca já foi feita
   int? _currentUserId;
 
   @override
@@ -32,12 +33,12 @@ class _SearchTabState extends State<SearchTab> {
   }
 
   void _searchUsers(String query) async {
-    if (query.isEmpty) {
-      return;
-    }
+    if (query.isEmpty) return;
 
     setState(() {
       _isLoading = true;
+      _hasSearched = true; // Marca que o usuário tentou buscar
+      _searchResults = []; // Limpa resultados anteriores
     });
 
     final results = await SocialService.searchUsers(query);
@@ -53,15 +54,19 @@ class _SearchTabState extends State<SearchTab> {
   void _sendFriendRequest(int targetUserId) async {
     final success = await SocialService.sendFriendRequest(targetUserId);
 
-    if (!mounted) return; // Correção de contexto assíncrono
+    if (!mounted) return;
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Solicitação de amizade enviada!')),
+        const SnackBar(
+            content: Text('Solicitação de amizade enviada!'),
+            backgroundColor: Colors.green),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao enviar solicitação.')),
+        const SnackBar(
+            content: Text('Erro ao enviar solicitação.'),
+            backgroundColor: Colors.red),
       );
     }
   }
@@ -93,39 +98,48 @@ class _SearchTabState extends State<SearchTab> {
         Expanded(
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  itemCount: _searchResults.length,
-                  itemBuilder: (context, index) {
-                    final user = _searchResults[index];
-                    if (user['id'] == _currentUserId) {
-                      return const SizedBox.shrink();
-                    }
-
-                    return ListTile(
-                      leading: CircleAvatar(
-                        // ignore: deprecated_member_use
-                        backgroundColor: AppColors.primary.withOpacity(0.2),
-                        child: Text(
-                          (user['nickname'] ?? '?')[0].toUpperCase(),
-                          style: const TextStyle(color: AppColors.primary),
-                        ),
-                      ),
-                      title: Text(
-                        user['nickname'] ?? 'Sem Nickname',
-                        style: const TextStyle(color: AppColors.white),
-                      ),
-                      subtitle: Text(
-                        user['nome'] ?? '',
+              : _searchResults.isEmpty
+                  ? Center(
+                      child: Text(
+                        _hasSearched
+                            ? 'Nenhum usuário encontrado.' // Exibe se já buscou e a lista tá vazia
+                            : 'Digite para buscar...', // Exibe se ainda não buscou nada
                         style: const TextStyle(color: AppColors.white54),
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.person_add,
-                            color: AppColors.primary),
-                        onPressed: () => _sendFriendRequest(user['id']),
-                      ),
-                    );
-                  },
-                ),
+                    )
+                  : ListView.builder(
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        final user = _searchResults[index];
+                        if (user['id'] == _currentUserId) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return ListTile(
+                          leading: CircleAvatar(
+                            // ignore: deprecated_member_use
+                            backgroundColor: AppColors.primary.withOpacity(0.2),
+                            child: Text(
+                              (user['nickname'] ?? '?')[0].toUpperCase(),
+                              style: const TextStyle(color: AppColors.primary),
+                            ),
+                          ),
+                          title: Text(
+                            user['nickname'] ?? 'Sem Nickname',
+                            style: const TextStyle(color: AppColors.white),
+                          ),
+                          subtitle: Text(
+                            user['nome'] ?? '',
+                            style: const TextStyle(color: AppColors.white54),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.person_add,
+                                color: AppColors.primary),
+                            onPressed: () => _sendFriendRequest(user['id']),
+                          ),
+                        );
+                      },
+                    ),
         ),
       ],
     );
