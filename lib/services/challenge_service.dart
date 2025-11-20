@@ -3,10 +3,13 @@ import 'package:erank_app/models/challenge.dart';
 
 class ChallengeService {
   // Criar desafio
-  static Future<void> createChallenge(int desafiadoId) async {
+  static Future<void> createChallenge(int desafiadoId, int jogoId) async {
     final response = await ApiClient.post(
       '/desafios',
-      body: {'desafiadoId': desafiadoId},
+      body: {
+        'desafiadoId': desafiadoId,
+        'jogoId': jogoId,
+      },
     );
     ApiClient.handleResponse(response);
   }

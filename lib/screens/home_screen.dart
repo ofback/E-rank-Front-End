@@ -1,6 +1,7 @@
 import 'package:erank_app/core/theme/app_colors.dart';
+import 'package:erank_app/screens/challenges/challenges_list_screen.dart'; // Import da Lista de Desafios
+import 'package:erank_app/screens/challenges/create_challenge_screen.dart'; // Import da Criação de Desafio
 import 'package:erank_app/screens/teams/team_details_screen.dart';
-// REMOVIDO: import 'package:erank_app/services/api_client.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/services/team_service.dart';
 import 'package:erank_app/services/auth_storage.dart';
@@ -28,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Helper para mostrar erros
+  // Helper para mostrar erros de forma segura
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -43,14 +44,30 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('E-Rank'),
+        title: const Text('E-Rank', style: TextStyle(color: Colors.white)),
         backgroundColor: AppColors.background,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          // --- NOVO: Botão para ver a lista de Desafios ---
+          IconButton(
+            icon: const Icon(Icons.sports_kabaddi, color: Colors.white),
+            tooltip: 'Meus Desafios',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ChallengesListScreen()),
+              );
+            },
+          ),
+          // Botão de Logout
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await AuthStorage.logout();
+              // Aqui você deve ter uma lógica para voltar ao Login (ex: Navigator.pushReplacement...)
+              // Se usar o AuthWrapper, um setState no main ou stream resolveria, mas por enquanto o logout limpa o token.
             },
           ),
         ],
@@ -215,6 +232,19 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      // --- NOVO: Botão Flutuante para Criar Desafio ---
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const CreateChallengeScreen()),
+          );
+        },
+        backgroundColor: AppColors.primary,
+        icon: const Icon(Icons.flash_on, color: Colors.white),
+        label: const Text('Desafiar', style: TextStyle(color: Colors.white)),
+      ),
     );
   }
 
@@ -241,18 +271,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 try {
                   await TeamService.removeMember(teamId, userId);
-                  // Verifica se o contexto do DIÁLOGO ainda é válido antes de fechar
                   if (dialogContext.mounted) {
                     Navigator.of(dialogContext).pop();
                   }
-                  // Recarrega a lista na tela principal
                   _loadMyTeams();
                 } catch (e) {
-                  // Se der erro, fecha o diálogo primeiro
                   if (dialogContext.mounted) {
                     Navigator.of(dialogContext).pop();
                   }
-                  // Depois mostra o erro usando o contexto da TELA (se montada)
                   if (mounted) {
                     _showError('Erro ao sair do time: $e');
                   }
