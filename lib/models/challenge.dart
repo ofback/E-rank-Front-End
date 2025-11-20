@@ -1,8 +1,7 @@
-// lib/models/challenge.dart
 class Challenge {
   final int id;
   final String desafianteNome;
-  final String status;
+  final String status; // 'P' (Pendente), 'A', 'R', etc.
   final String dataHora;
 
   Challenge({
