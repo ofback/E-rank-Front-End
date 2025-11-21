@@ -64,12 +64,14 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
             itemCount: list.length,
             itemBuilder: (context, index) {
               final challenge = list[index];
+
+              final bool jaRegistrei = challenge.status == 'AGUARDANDO';
+
               return Card(
                 color: AppColors.surface,
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   title: Text(
-                    // CORREÇÃO: Removido '${...}'
                     challenge.desafianteNome,
                     style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
@@ -78,22 +80,42 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
                     'Data: ${challenge.dataHora}',
                     style: const TextStyle(color: Colors.white54),
                   ),
-                  trailing: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary),
-                    child: const Text('Registrar',
-                        style: TextStyle(color: Colors.white)),
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              RegisterResultScreen(challenge: challenge),
+                  // CORREÇÃO AQUI: Layout mais compacto para evitar overflow
+                  trailing: jaRegistrei
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.orange),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'Aguardando\nOponente',
+                            textAlign: TextAlign.center,
+                            style:
+                                TextStyle(color: Colors.orange, fontSize: 10),
+                          ),
+                        )
+                      : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12), // Reduz padding do botão
+                          ),
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RegisterResultScreen(challenge: challenge),
+                              ),
+                            );
+                            _loadMatches();
+                          },
+                          child: const Text('Registrar',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 12)),
                         ),
-                      );
-                      _loadMatches();
-                    },
-                  ),
                 ),
               );
             },
