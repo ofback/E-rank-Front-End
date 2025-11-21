@@ -1,5 +1,6 @@
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/services/social_service.dart';
+import 'package:erank_app/services/auth_storage.dart';
 import 'package:flutter/material.dart';
 
 class SearchTab extends StatefulWidget {
@@ -10,157 +11,137 @@ class SearchTab extends StatefulWidget {
 }
 
 class _SearchTabState extends State<SearchTab> {
-  final _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
-  String? _searchMessage;
-  final Set<int> _pendingRequestIds = {};
-  int? _loadingUserId;
+  bool _hasSearched = false; // Variável para controlar se a busca já foi feita
+  int? _currentUserId;
 
   @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
   }
 
-  Future<void> _searchUsers(String nickname) async {
-    if (nickname.trim().isEmpty) {
+  Future<void> _loadCurrentUser() async {
+    final userId = await AuthStorage.getUserId();
+    if (mounted) {
       setState(() {
-        _searchResults = [];
-        _searchMessage = null;
+        _currentUserId = userId;
       });
-      return;
     }
+  }
+
+  void _searchUsers(String query) async {
+    if (query.isEmpty) return;
+
     setState(() {
       _isLoading = true;
-      _searchMessage = null;
+      _hasSearched = true; // Marca que o usuário tentou buscar
+      _searchResults = []; // Limpa resultados anteriores
     });
 
-    final results = await SocialService.searchUsers(nickname);
+    final results = await SocialService.searchUsers(query);
+
+    if (mounted) {
+      setState(() {
+        _searchResults = results;
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _sendFriendRequest(int targetUserId) async {
+    final success = await SocialService.sendFriendRequest(targetUserId);
 
     if (!mounted) return;
 
-    setState(() {
-      _isLoading = false;
-      _searchResults = results;
-      if (_searchResults.isEmpty) {
-        _searchMessage = 'Nenhum jogador encontrado.';
-      }
-    });
-  }
-
-  Future<void> _addFriend(int userId) async {
-    setState(() {
-      _loadingUserId = userId;
-    });
-    final success = await SocialService.sendFriendRequest(userId);
-    if (!mounted) return;
-    setState(() {
-      _loadingUserId = null;
-      if (success) {
-        _pendingRequestIds.add(userId);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: AppColors.green,
-            content: Text('Pedido de amizade enviado!'),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: AppColors.red,
-            content: Text('Não foi possível enviar o pedido. Tente novamente.'),
-          ),
-        );
-      }
-    });
-  }
-
-  Widget _buildTrailingWidget(int userId) {
-    if (_loadingUserId == userId) {
-      return const SizedBox(
-        width: 24,
-        height: 24,
-        child: CircularProgressIndicator(strokeWidth: 2),
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Solicitação de amizade enviada!'),
+            backgroundColor: Colors.green),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Erro ao enviar solicitação.'),
+            backgroundColor: Colors.red),
       );
     }
-    if (_pendingRequestIds.contains(userId)) {
-      // CORREÇÃO AQUI: Envolvendo o Icon com o Tooltip
-      return const Tooltip(
-        message: 'Pedido enviado',
-        child: Icon(Icons.check_circle, color: AppColors.green),
-      );
-    }
-    // CORREÇÃO AQUI: Envolvendo o Icon com o Tooltip
-    return IconButton(
-      icon:
-          const Icon(Icons.person_add_alt_1_rounded, color: AppColors.primary),
-      onPressed: () => _addFriend(userId),
-      tooltip: 'Adicionar amigo',
-    );
-  }
-
-  Widget _buildResultsList() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_searchMessage != null) {
-      return Center(
-          child: Text(_searchMessage!,
-              style: const TextStyle(color: AppColors.white54)));
-    }
-    return ListView.builder(
-      itemCount: _searchResults.length,
-      itemBuilder: (context, index) {
-        final user = _searchResults[index];
-        return Card(
-          color: Colors.white.withOpacity(0.05),
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: AppColors.primary.withOpacity(0.8),
-              child: Text(
-                user['nickname']?[0].toUpperCase() ?? '?',
-                style: const TextStyle(color: AppColors.white),
-              ),
-            ),
-            title: Text(
-              user['nickname'] ?? 'Usuário',
-              style: const TextStyle(
-                  color: AppColors.white, fontWeight: FontWeight.bold),
-            ),
-            trailing: _buildTrailingWidget(user['id']),
-          ),
-        );
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          TextField(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextField(
             controller: _searchController,
+            style: const TextStyle(color: AppColors.white),
             decoration: InputDecoration(
-              hintText: 'Buscar jogadores por nickname...',
+              hintText: 'Buscar usuários...',
               hintStyle: const TextStyle(color: AppColors.white54),
               prefixIcon: const Icon(Icons.search, color: AppColors.white54),
               filled: true,
-              fillColor: Colors.white.withOpacity(0.1),
+              // ignore: deprecated_member_use
+              fillColor: AppColors.white.withOpacity(0.05),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(30),
                 borderSide: BorderSide.none,
               ),
             ),
             onSubmitted: _searchUsers,
           ),
-          const SizedBox(height: 20),
-          Expanded(child: _buildResultsList()),
-        ],
-      ),
+        ),
+        Expanded(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _searchResults.isEmpty
+                  ? Center(
+                      child: Text(
+                        _hasSearched
+                            ? 'Nenhum usuário encontrado.' // Exibe se já buscou e a lista tá vazia
+                            : 'Digite para buscar...', // Exibe se ainda não buscou nada
+                        style: const TextStyle(color: AppColors.white54),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        final user = _searchResults[index];
+                        if (user['id'] == _currentUserId) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return ListTile(
+                          leading: CircleAvatar(
+                            // ignore: deprecated_member_use
+                            backgroundColor: AppColors.primary.withOpacity(0.2),
+                            child: Text(
+                              (user['nickname'] ?? '?')[0].toUpperCase(),
+                              style: const TextStyle(color: AppColors.primary),
+                            ),
+                          ),
+                          title: Text(
+                            user['nickname'] ?? 'Sem Nickname',
+                            style: const TextStyle(color: AppColors.white),
+                          ),
+                          subtitle: Text(
+                            user['nome'] ?? '',
+                            style: const TextStyle(color: AppColors.white54),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.person_add,
+                                color: AppColors.primary),
+                            onPressed: () => _sendFriendRequest(user['id']),
+                          ),
+                        );
+                      },
+                    ),
+        ),
+      ],
     );
   }
 }

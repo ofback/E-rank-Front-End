@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:erank_app/services/team_service.dart';
+// REMOVIDO: import 'package:erank_app/services/api_client.dart';
 
 class CreateTeamScreen extends StatefulWidget {
   const CreateTeamScreen({super.key});
@@ -20,14 +21,12 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
   final _descriptionController = TextEditingController();
   bool _isLoading = false;
 
-  // Novos estados para gerenciar a lista de amigos e a seleção
   late Future<List<dynamic>> _friendsFuture;
   final Set<int> _selectedFriendIds = {};
 
   @override
   void initState() {
     super.initState();
-    // Busca a lista de amigos ao iniciar a tela
     _friendsFuture = SocialService.getMyFriends();
   }
 
@@ -39,40 +38,40 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
   }
 
   Future<void> _createTeam() async {
-    // Transforme em async
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     setState(() => _isLoading = true);
 
-    // Chama o serviço com todas as informações necessárias
-    final success = await TeamService.createTeam(
-      name: _teamNameController.text,
-      description: _descriptionController.text,
-      memberIds: _selectedFriendIds.toList(), // Converte o Set para uma List
-    );
+    try {
+      await TeamService.createTeam(
+        name: _teamNameController.text,
+        description: _descriptionController.text,
+        memberIds: _selectedFriendIds.toList(),
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() => _isLoading = false);
-
-    if (success) {
+      // Sucesso
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: AppColors.green,
           content: Text('Time criado e convites enviados com sucesso!'),
         ),
       );
-      // Volta para a tela de perfil
       Navigator.of(context).pop();
-    } else {
+    } catch (e) {
+      if (!mounted) return;
+      // Erro
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: AppColors.red,
-          content: Text('Erro ao criar o time. Tente novamente.'),
+          content: Text('Erro ao criar time: $e'),
         ),
       );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -105,6 +104,7 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
               CustomFormField(
                 controller: _teamNameController,
                 label: 'Nome do Time',
+                icon: Icons.group,
                 validator:
                     RequiredValidator(errorText: 'O nome do time é obrigatório')
                         .call,
@@ -137,10 +137,7 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
                         .call,
               ),
               const SizedBox(height: 40),
-
-              // --- SEÇÃO DE CONVIDAR AMIGOS ---
               _buildFriendsInviteSection(),
-
               const SizedBox(height: 40),
               PrimaryButton(
                 text: 'CRIAR E CONVIDAR',
@@ -168,8 +165,9 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
         ),
         const SizedBox(height: 8),
         Container(
-          height: 200, // Altura fixa para a lista de amigos
+          height: 200,
           decoration: BoxDecoration(
+            // ignore: deprecated_member_use
             color: Colors.white.withOpacity(0.05),
             borderRadius: BorderRadius.circular(8),
           ),

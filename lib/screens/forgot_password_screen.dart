@@ -16,7 +16,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _isLoading = false;
 
   void _sendRecoveryEmail() {
-    // Simula uma chamada de API
     setState(() => _isLoading = true);
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
@@ -59,11 +58,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
+
+                // --- CORREÇÃO: Adicionado icon ---
                 CustomFormField(
                   controller: _emailController,
                   label: 'E-mail',
+                  icon: Icons.email, // Ícone obrigatório
                   keyboardType: TextInputType.emailAddress,
                 ),
+
                 const SizedBox(height: 30),
                 PrimaryButton(
                   text: 'ENVIAR',

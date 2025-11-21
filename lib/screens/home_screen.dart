@@ -1,4 +1,6 @@
 import 'package:erank_app/core/theme/app_colors.dart';
+import 'package:erank_app/screens/challenges/challenges_list_screen.dart'; // Import da Lista de Desafios
+import 'package:erank_app/screens/challenges/create_challenge_screen.dart'; // Import da Criação de Desafio
 import 'package:erank_app/screens/teams/team_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/services/team_service.dart';
@@ -9,7 +11,7 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -27,6 +29,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Helper para mostrar erros de forma segura
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,13 +44,31 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('E-Rank'),
+        title: const Text('E-Rank', style: TextStyle(color: Colors.white)),
         backgroundColor: AppColors.background,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          // --- NOVO: Botão para ver a lista de Desafios ---
+          IconButton(
+            icon: const Icon(Icons.sports_kabaddi, color: Colors.white),
+            tooltip: 'Meus Desafios',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ChallengesListScreen()),
+              );
+            },
+          ),
+          // Botão de Logout
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {},
+            onPressed: () async {
+              await AuthStorage.logout();
+              // Aqui você deve ter uma lógica para voltar ao Login (ex: Navigator.pushReplacement...)
+              // Se usar o AuthWrapper, um setState no main ou stream resolveria, mas por enquanto o logout limpa o token.
+            },
           ),
         ],
       ),
@@ -75,7 +103,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: myTeams.length,
                   itemBuilder: (context, index) {
                     final team = myTeams[index];
-                    // Como corrigimos o DTO Java, as chaves agora vêm corretas ('id', 'nome')
                     final int teamId = team['id'] ?? 0;
                     final String teamName = team['nome'] ?? 'Sem Nome';
                     final String teamCargo = team['cargo'] ?? 'Membro';
@@ -123,7 +150,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ),
                                   ),
-                                  // Botão Sair (só aparece se já aceitou)
                                   if (teamStatus == 'A')
                                     IconButton(
                                       icon: const Icon(Icons.exit_to_app,
@@ -145,7 +171,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ] else ...[
-                                // ÁREA DE CONVITE PENDENTE
                                 const Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text('Convite Pendente',
@@ -159,9 +184,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.green),
                                         onPressed: () async {
-                                          await TeamService.respondInvite(
-                                              teamId, true);
-                                          _loadMyTeams();
+                                          try {
+                                            await TeamService.respondInvite(
+                                                teamId, true);
+                                            _loadMyTeams();
+                                          } catch (e) {
+                                            _showError(e.toString());
+                                          }
                                         },
                                         child: const Text("Aceitar",
                                             style:
@@ -175,9 +204,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                             side: const BorderSide(
                                                 color: Colors.red)),
                                         onPressed: () async {
-                                          await TeamService.respondInvite(
-                                              teamId, false);
-                                          _loadMyTeams();
+                                          try {
+                                            await TeamService.respondInvite(
+                                                teamId, false);
+                                            _loadMyTeams();
+                                          } catch (e) {
+                                            _showError(e.toString());
+                                          }
                                         },
                                         child: const Text("Recusar",
                                             style:
@@ -199,13 +232,26 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      // --- NOVO: Botão Flutuante para Criar Desafio ---
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const CreateChallengeScreen()),
+          );
+        },
+        backgroundColor: AppColors.primary,
+        icon: const Icon(Icons.flash_on, color: Colors.white),
+        label: const Text('Desafiar', style: TextStyle(color: Colors.white)),
+      ),
     );
   }
 
   void _showLeaveTeamDialog(BuildContext context, int teamId, String teamName) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.surface,
           title:
@@ -215,17 +261,28 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: <Widget>[
             TextButton(
               child: const Text('Cancelar'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             TextButton(
               child: const Text('Sair', style: TextStyle(color: Colors.red)),
               onPressed: () async {
                 final userId = await AuthStorage.getUserId();
                 if (userId == null) return;
-                bool success = await TeamService.removeMember(teamId, userId);
-                if (!context.mounted) return;
-                Navigator.of(context).pop();
-                if (success) _loadMyTeams();
+
+                try {
+                  await TeamService.removeMember(teamId, userId);
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop();
+                  }
+                  _loadMyTeams();
+                } catch (e) {
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop();
+                  }
+                  if (mounted) {
+                    _showError('Erro ao sair do time: $e');
+                  }
+                }
               },
             ),
           ],

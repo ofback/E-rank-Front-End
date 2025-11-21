@@ -14,7 +14,7 @@ class TeamDetailsScreen extends StatefulWidget {
 }
 
 class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
-  Future<List<TeamMember>>? _membersFuture; // Removido 'late' para evitar crash
+  Future<List<TeamMember>>? _membersFuture;
   int? _currentUserId;
 
   @override
@@ -42,6 +42,13 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
     setState(() {
       _membersFuture = TeamService.getTeamMembers(widget.team['id'] ?? 0);
     });
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
   }
 
   @override
@@ -144,15 +151,20 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
 
   void _promote(TeamMember member) async {
     final newRole = member.isMembro ? 'ViceLider' : 'Membro';
-    if (await TeamService.updateRole(
-        widget.team['id'], member.userId, newRole)) {
-      _refresh();
+    try {
+      await TeamService.updateRole(widget.team['id'], member.userId, newRole);
+      if (mounted) _refresh();
+    } catch (e) {
+      _showError(e.toString());
     }
   }
 
   void _kick(TeamMember member) async {
-    if (await TeamService.removeMember(widget.team['id'], member.userId)) {
-      _refresh();
+    try {
+      await TeamService.removeMember(widget.team['id'], member.userId);
+      if (mounted) _refresh();
+    } catch (e) {
+      _showError(e.toString());
     }
   }
 
@@ -178,9 +190,22 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
             onPressed: () async {
               final id = int.tryParse(controller.text);
               if (id != null) {
-                Navigator.pop(ctx);
-                await TeamService.addMember(widget.team['id'], id);
-                _refresh();
+                Navigator.pop(ctx); // Fecha o Dialog (sync, ok)
+
+                try {
+                  await TeamService.addMember(widget.team['id'], id);
+
+                  // Verifica se a tela ainda está ativa antes de usar context
+                  if (!mounted) return;
+
+                  _refresh();
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Convite enviado!"),
+                      backgroundColor: Colors.green));
+                } catch (e) {
+                  // _showError já tem check de mounted
+                  _showError(e.toString());
+                }
               }
             },
             child: const Text('Adicionar'),

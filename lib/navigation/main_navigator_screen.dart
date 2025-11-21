@@ -1,4 +1,3 @@
-// E-rank-Front-End/lib/navigation/main_navigator_screen.dart
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/screens/home_screen.dart';
 import 'package:erank_app/screens/profile/profile_screen.dart';
@@ -15,11 +14,11 @@ class MainNavigatorScreen extends StatefulWidget {
 class _MainNavigatorScreenState extends State<MainNavigatorScreen> {
   int _selectedIndex = 0;
 
-  // Lista das telas principais
-  static const List<Widget> _widgetOptions = <Widget>[
-    HomeScreen(),
-    SocialScreen(),
-    ProfileScreen(),
+  // Removido 'const' pois os widgets podem não ser const
+  static final List<Widget> _widgetOptions = <Widget>[
+    const HomeScreen(),
+    const SocialScreen(), // Garanta que SocialScreen tem construtor const
+    const ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -32,11 +31,7 @@ class _MainNavigatorScreenState extends State<MainNavigatorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-
-      // O body está limpo, sem SafeArea ou Center
       body: _widgetOptions.elementAt(_selectedIndex),
-
-      // A barra de navegação inferior
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
