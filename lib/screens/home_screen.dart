@@ -1,6 +1,7 @@
 import 'package:erank_app/core/theme/app_colors.dart';
-import 'package:erank_app/screens/challenges/challenges_list_screen.dart'; // Import da Lista de Desafios
-import 'package:erank_app/screens/challenges/create_challenge_screen.dart'; // Import da Criação de Desafio
+import 'package:erank_app/screens/challenges/active_matches_screen.dart'; // IMPORT NOVO
+import 'package:erank_app/screens/challenges/challenges_list_screen.dart';
+import 'package:erank_app/screens/challenges/create_challenge_screen.dart';
 import 'package:erank_app/screens/teams/team_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/services/team_service.dart';
@@ -29,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Helper para mostrar erros de forma segura
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -49,10 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          // --- NOVO: Botão para ver a lista de Desafios ---
+          // 1. Botão de Desafios Pendentes (Convites recebidos)
           IconButton(
             icon: const Icon(Icons.sports_kabaddi, color: Colors.white),
-            tooltip: 'Meus Desafios',
+            tooltip: 'Desafios Pendentes',
             onPressed: () {
               Navigator.push(
                 context,
@@ -61,13 +61,24 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // Botão de Logout
+          // 2. NOVO: Botão de Partidas Ativas (Registrar Resultado)
+          IconButton(
+            icon: const Icon(Icons.sports_esports, color: Colors.white),
+            tooltip: 'Minhas Partidas',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ActiveMatchesScreen()),
+              );
+            },
+          ),
+          // 3. Logout
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await AuthStorage.logout();
-              // Aqui você deve ter uma lógica para voltar ao Login (ex: Navigator.pushReplacement...)
-              // Se usar o AuthWrapper, um setState no main ou stream resolveria, mas por enquanto o logout limpa o token.
+              // Adicione aqui a navegação de volta para login se necessário
             },
           ),
         ],
@@ -232,7 +243,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      // --- NOVO: Botão Flutuante para Criar Desafio ---
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(
