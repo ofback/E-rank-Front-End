@@ -10,9 +10,7 @@ class RequestsTab extends StatefulWidget {
 }
 
 class _RequestsTabState extends State<RequestsTab> {
-  // Usaremos um Future para a busca inicial
   late Future<List<dynamic>> _requestsFuture;
-  // E uma lista local para gerenciar o estado da UI
   List<dynamic>? _requests;
   int? _loadingFriendshipId;
 
@@ -40,7 +38,6 @@ class _RequestsTabState extends State<RequestsTab> {
     setState(() {
       _loadingFriendshipId = null;
       if (success) {
-        // Remove o item da lista local para atualizar a UI instantaneamente
         _requests?.removeWhere((req) => req['friendshipId'] == friendshipId);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -74,7 +71,6 @@ class _RequestsTabState extends State<RequestsTab> {
                   style: TextStyle(color: AppColors.white)));
         }
 
-        // Quando o future completa, inicializa nossa lista de estado
         if (_requests == null && snapshot.hasData) {
           _requests = snapshot.data!;
         }
@@ -94,10 +90,12 @@ class _RequestsTabState extends State<RequestsTab> {
                 _loadingFriendshipId == request['friendshipId'];
 
             return Card(
+              // ignore: deprecated_member_use
               color: Colors.white.withOpacity(0.05),
               margin: const EdgeInsets.symmetric(vertical: 4),
               child: ListTile(
                 leading: CircleAvatar(
+                  // ignore: deprecated_member_use
                   backgroundColor: AppColors.primary.withOpacity(0.8),
                   child: Text(
                     request['senderNickname']?[0].toUpperCase() ?? '?',
