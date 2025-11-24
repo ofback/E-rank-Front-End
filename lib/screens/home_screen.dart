@@ -1,7 +1,8 @@
 import 'package:erank_app/core/theme/app_colors.dart';
-import 'package:erank_app/screens/challenges/active_matches_screen.dart'; // IMPORT NOVO
+import 'package:erank_app/screens/challenges/active_matches_screen.dart';
 import 'package:erank_app/screens/challenges/challenges_list_screen.dart';
 import 'package:erank_app/screens/challenges/create_challenge_screen.dart';
+import 'package:erank_app/screens/stats/stats_screen.dart'; // IMPORT NOVO
 import 'package:erank_app/screens/teams/team_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/services/team_service.dart';
@@ -61,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // 2. NOVO: Botão de Partidas Ativas (Registrar Resultado)
+          // 2. Botão de Partidas Ativas (Registrar Resultado)
           IconButton(
             icon: const Icon(Icons.sports_esports, color: Colors.white),
             tooltip: 'Minhas Partidas',
@@ -73,12 +74,25 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // 3. Logout
+          // 3. NOVO: Botão de Estatísticas (Player Card)
+          IconButton(
+            icon: const Icon(Icons.bar_chart, color: Colors.white),
+            tooltip: 'Minhas Estatísticas',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const StatsScreen()),
+              );
+            },
+          ),
+          // 4. Logout
           IconButton(
             icon: const Icon(Icons.logout),
+            tooltip: 'Sair',
             onPressed: () async {
               await AuthStorage.logout();
               // Adicione aqui a navegação de volta para login se necessário
+              // Navigator.of(context).pushReplacementNamed('/login');
             },
           ),
         ],

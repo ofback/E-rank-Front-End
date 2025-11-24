@@ -1,5 +1,5 @@
-// lib/services/estatisticas_service.dart
 import 'package:erank_app/services/api_client.dart';
+import 'package:erank_app/models/player_card.dart';
 
 class EstatisticasService {
   // Registrar o resultado de uma partida
@@ -31,6 +31,16 @@ class EstatisticasService {
       // Você pode relançar o erro ou tratar aqui.
       // Recomendo relançar para a tela mostrar o Snackbar.
       rethrow;
+    }
+  }
+
+  static Future<PlayerCard?> getMyPlayerCard() async {
+    try {
+      final response = await ApiClient.get('/estatisticas/me/card');
+      final data = ApiClient.handleResponse(response);
+      return PlayerCard.fromJson(data);
+    } catch (e) {
+      return null;
     }
   }
 }
