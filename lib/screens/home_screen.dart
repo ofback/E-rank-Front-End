@@ -2,7 +2,8 @@ import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/screens/challenges/active_matches_screen.dart';
 import 'package:erank_app/screens/challenges/challenges_list_screen.dart';
 import 'package:erank_app/screens/challenges/create_challenge_screen.dart';
-import 'package:erank_app/screens/stats/stats_screen.dart'; // IMPORT NOVO
+import 'package:erank_app/screens/ranking/ranking_screen.dart'; // NOVO IMPORT
+import 'package:erank_app/screens/stats/stats_screen.dart';
 import 'package:erank_app/screens/teams/team_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/services/team_service.dart';
@@ -50,7 +51,19 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          // 1. Botão de Desafios Pendentes (Convites recebidos)
+          // 1. Botão de Ranking (NOVO)
+          IconButton(
+            icon: const Icon(Icons.emoji_events,
+                color: Colors.amber), // Ícone de Troféu
+            tooltip: 'Ver Ranking',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const RankingScreen()),
+              );
+            },
+          ),
+          // 2. Botão de Desafios Pendentes
           IconButton(
             icon: const Icon(Icons.sports_kabaddi, color: Colors.white),
             tooltip: 'Desafios Pendentes',
@@ -62,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // 2. Botão de Partidas Ativas (Registrar Resultado)
+          // 3. Botão de Partidas Ativas
           IconButton(
             icon: const Icon(Icons.sports_esports, color: Colors.white),
             tooltip: 'Minhas Partidas',
@@ -74,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // 3. NOVO: Botão de Estatísticas (Player Card)
+          // 4. Botão de Estatísticas
           IconButton(
             icon: const Icon(Icons.bar_chart, color: Colors.white),
             tooltip: 'Minhas Estatísticas',
@@ -85,14 +98,16 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // 4. Logout
+          // 5. Logout
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sair',
             onPressed: () async {
               await AuthStorage.logout();
-              // Adicione aqui a navegação de volta para login se necessário
-              // Navigator.of(context).pushReplacementNamed('/login');
+              if (context.mounted) {
+                // Redirecionar para login se necessário, ou apenas atualizar o estado
+                // Navigator.of(context).pushReplacementNamed('/login');
+              }
             },
           ),
         ],

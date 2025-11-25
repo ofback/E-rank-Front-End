@@ -1,12 +1,11 @@
 class RankingDTO {
-  final int posicao;
   final String nickname;
   final int pontuacao;
   final int vitorias;
   final int kills;
+  // A posição será calculada visualmente na lista
 
   RankingDTO({
-    required this.posicao,
     required this.nickname,
     required this.pontuacao,
     required this.vitorias,
@@ -15,11 +14,10 @@ class RankingDTO {
 
   factory RankingDTO.fromJson(Map<String, dynamic> json) {
     return RankingDTO(
-      posicao: json['posicao'] ?? 0,
       nickname: json['nickname'] ?? 'Desconhecido',
-      pontuacao: json['pontuacao'] ?? 0,
-      vitorias: json['vitorias'] ?? 0,
-      kills: json['kills'] ?? 0,
+      pontuacao: (json['pontuacao'] as num?)?.toInt() ?? 0,
+      vitorias: (json['vitorias'] as num?)?.toInt() ?? 0,
+      kills: (json['kills'] as num?)?.toInt() ?? 0,
     );
   }
 }
