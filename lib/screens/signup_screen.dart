@@ -1,4 +1,3 @@
-// E-rank-Front-End/lib/screens/signup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -37,24 +36,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isLoading = false;
   bool _agreeToTerms = false;
 
-  Widget _buildSmallScreenHeader() {
-    return Column(
-      children: [
-        const SizedBox(height: 40),
-        Image.asset('assets/erank_logo.png', height: 80),
-        const SizedBox(height: 20),
-        Text(
-          'Criar uma Conta',
-          style: GoogleFonts.exo2(
-            fontSize: 32,
-            color: AppColors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
+  // --- CORES DAS BORDAS ---
+  Color? _nomeColor;
+  Color? _nickColor;
+  Color? _dataColor;
+  Color? _cpfColor;
+  Color? _emailColor;
+  Color? _confirmEmailColor;
+  Color? _passColor;
+  Color? _confirmPassColor;
 
   @override
   void dispose() {
@@ -68,6 +58,142 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _confirmPasswordController.dispose();
     super.dispose();
   }
+
+  // ==========================================================
+  // LÓGICA DE VALIDAÇÃO VISUAL (BORDAS VERDES/VERMELHAS)
+  // ==========================================================
+
+  // 1. NOME COMPLETO: Pelo menos dois nomes
+  void _validateNome(String val) {
+    setState(() {
+      if (val.isEmpty) {
+        _nomeColor = null;
+      } else if (val.trim().split(' ').length >= 2) {
+        _nomeColor = Colors.greenAccent;
+      } else {
+        _nomeColor = Colors.redAccent;
+      }
+    });
+  }
+
+  // 2. NICKNAME: Mínimo 2 caracteres
+  void _validateNick(String val) {
+    setState(() {
+      if (val.isEmpty) {
+        _nickColor = null;
+      } else if (val.length >= 2) {
+        _nickColor = Colors.greenAccent;
+      } else {
+        _nickColor = Colors.redAccent;
+      }
+    });
+  }
+
+  // 3. DATA: Dia <= 31 e Mês <= 12
+  void _validateDate(String val) {
+    setState(() {
+      if (val.isEmpty) {
+        _dataColor = null;
+        return;
+      }
+
+      if (val.length != 10) {
+        _dataColor = Colors.redAccent; // Incompleto
+        return;
+      }
+
+      // Validação logica
+      try {
+        final parts = val.split('/'); // Ex: ["15", "05", "2000"]
+        final day = int.parse(parts[0]);
+        final month = int.parse(parts[1]);
+        final year = int.parse(parts[2]);
+
+        if (day > 0 && day <= 31 && month > 0 && month <= 12 && year > 1900) {
+          _dataColor = Colors.greenAccent;
+        } else {
+          _dataColor = Colors.redAccent;
+        }
+      } catch (e) {
+        _dataColor = Colors.redAccent;
+      }
+    });
+  }
+
+  // CPF (Apenas tamanho por enquanto)
+  void _validateCPF(String val) {
+    setState(() {
+      if (val.isEmpty)
+        _cpfColor = null;
+      else if (val.length == 14)
+        _cpfColor = Colors.greenAccent;
+      else
+        _cpfColor = Colors.redAccent;
+    });
+  }
+
+  // Email Regex
+  void _validateEmail(String val) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    setState(() {
+      if (val.isEmpty)
+        _emailColor = null;
+      else if (emailRegex.hasMatch(val))
+        _emailColor = Colors.greenAccent;
+      else
+        _emailColor = Colors.redAccent;
+    });
+  }
+
+  // Confirmação Email
+  void _validateConfirmEmail(String val) {
+    setState(() {
+      if (val.isEmpty)
+        _confirmEmailColor = null;
+      else if (val == _emailController.text &&
+          _emailColor == Colors.greenAccent) {
+        _confirmEmailColor = Colors.greenAccent;
+      } else {
+        _confirmEmailColor = Colors.redAccent;
+      }
+    });
+  }
+
+  // 4. SENHA FORTE: 8 chars, maiuscula, minuscula, numero
+  void _validatePass(String val) {
+    // Regex:
+    // (?=.*[A-Z]) -> Tem maiúscula
+    // (?=.*[a-z]) -> Tem minúscula
+    // (?=.*[0-9]) -> Tem número
+    // .{8,}       -> Mínimo 8 caracteres
+    final passwordRegex = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$');
+
+    setState(() {
+      if (val.isEmpty) {
+        _passColor = null;
+      } else if (passwordRegex.hasMatch(val)) {
+        _passColor = Colors.greenAccent;
+      } else {
+        _passColor = Colors.redAccent;
+      }
+    });
+  }
+
+  // Confirmação Senha
+  void _validateConfirmPass(String val) {
+    setState(() {
+      if (val.isEmpty)
+        _confirmPassColor = null;
+      else if (val == _passwordController.text)
+        _confirmPassColor = Colors.greenAccent;
+      else
+        _confirmPassColor = Colors.redAccent;
+    });
+  }
+
+  // ==========================================================
+  // CADASTRO
+  // ==========================================================
 
   Future<void> _registerUser() async {
     if (!_formKey.currentState!.validate()) return;
@@ -114,7 +240,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              backgroundColor: AppColors.green,
+              backgroundColor: Colors.green,
               content: Text('Usuário cadastrado! Faça o login.')),
         );
         Navigator.pushReplacement(context,
@@ -132,17 +258,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = false);
   }
 
+  // Header Mobile
+  Widget _buildSmallScreenHeader() {
+    return Column(
+      children: [
+        const SizedBox(height: 40),
+        Image.asset('assets/erank_logo.png', height: 80),
+        const SizedBox(height: 20),
+        Text(
+          'Criar uma Conta',
+          style: GoogleFonts.exo2(
+              fontSize: 32,
+              color: AppColors.white,
+              fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isLargeScreen = screenWidth > 800;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFF0F0C29),
       body: SafeArea(
         child: isLargeScreen
             ? Row(
                 children: [
+                  // Esquerda
                   Expanded(
                     flex: 1,
                     child: Container(
@@ -171,6 +317,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
+                  // Direita
                   Expanded(
                     flex: 1,
                     child: Container(
@@ -193,28 +340,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ],
               )
+            // Mobile
             : LayoutBuilder(
                 builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: IntrinsicHeight(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _buildSmallScreenHeader(),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 24.0),
-                              child: _buildSignUpFormContent(),
-                            ),
-                            const SizedBox(height: 40),
-                          ],
+                  return Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Image.asset(
+                          'assets/background_signup2.png',
+                          fit: BoxFit.cover,
+                          errorBuilder: (c, e, s) =>
+                              Container(color: const Color(0xFF0F0C29)),
                         ),
                       ),
-                    ),
+                      SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints:
+                              BoxConstraints(minHeight: constraints.maxHeight),
+                          child: IntrinsicHeight(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildSmallScreenHeader(),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24.0),
+                                  child: _buildSignUpFormContent(),
+                                ),
+                                const SizedBox(height: 40),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),
@@ -225,7 +384,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildSignUpFormContent() {
     final screenWidth = MediaQuery.of(context).size.width;
     final crossAxisCount = screenWidth > 750 ? 2 : 1;
-
     final double childAspectRatio =
         crossAxisCount == 2 ? 4.0 : (screenWidth > 400 ? 5.0 : 4.5);
 
@@ -233,12 +391,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       constraints: const BoxConstraints(maxWidth: 750),
       child: Container(
         decoration: BoxDecoration(
-            color: AppColors.white,
+            color: const Color(0xFF1E1E2C).withOpacity(0.95),
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white24),
             boxShadow: [
               BoxShadow(
-                  // ignore: deprecated_member_use
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withOpacity(0.5),
                   blurRadius: 10,
                   offset: const Offset(0, 5)),
             ]),
@@ -250,12 +408,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
             Text('Comece sua jornada',
                 style: GoogleFonts.poppins(
                     fontSize: 24,
-                    color: AppColors.black87,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text('Preencha seus dados para entrar no ranking.',
                 style:
-                    GoogleFonts.poppins(fontSize: 14, color: AppColors.grey)),
+                    GoogleFonts.poppins(fontSize: 14, color: Colors.white70)),
             const SizedBox(height: 30),
             GridView.count(
               crossAxisCount: crossAxisCount,
@@ -265,91 +423,126 @@ class _SignUpScreenState extends State<SignUpScreen> {
               mainAxisSpacing: 20,
               childAspectRatio: childAspectRatio,
               children: [
-                // CORRIGIDO: Adicionado 'icon'
+                // 1. NOME (Validação: 2 nomes)
                 CustomFormField(
                   controller: _nomeController,
                   label: 'NOME COMPLETO',
                   icon: Icons.person,
-                  validator:
-                      RequiredValidator(errorText: 'Nome é obrigatório').call,
-                ),
-                // CORRIGIDO: Adicionado 'icon'
-                CustomFormField(
-                  controller: _nicknameController,
-                  label: 'NICKNAME (APELIDO)',
-                  icon: Icons.alternate_email,
-                  validator:
-                      RequiredValidator(errorText: 'Nickname é obrigatório')
-                          .call,
-                ),
-                // CORRIGIDO: Adicionado 'icon'
-                CustomFormField(
-                  controller: _dataNascimentoController,
-                  label: 'DATA DE NASCIMENTO',
-                  icon: Icons.calendar_today,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [_dataNascimentoMask],
+                  borderColor: _nomeColor,
+                  onChanged: _validateNome,
                   validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return 'Data é obrigatória';
-                    }
-                    if (val.length != 10) return 'Data inválida';
+                    if (val == null || val.isEmpty) return 'Nome é obrigatório';
+                    if (val.trim().split(' ').length < 2)
+                      return 'Digite nome e sobrenome';
                     return null;
                   },
                 ),
-                // CORRIGIDO: Adicionado 'icon'
+
+                // 2. NICK (Validação: min 2 chars)
+                CustomFormField(
+                  controller: _nicknameController,
+                  label: 'NICKNAME',
+                  icon: Icons.alternate_email,
+                  borderColor: _nickColor,
+                  onChanged: _validateNick,
+                  validator: (val) {
+                    if (val == null || val.isEmpty) return 'Obrigatório';
+                    if (val.length < 2) return 'Mínimo 2 caracteres';
+                    return null;
+                  },
+                ),
+
+                // 3. DATA (Validação: Logica dia/mês)
+                CustomFormField(
+                  controller: _dataNascimentoController,
+                  label: 'NASCIMENTO',
+                  icon: Icons.calendar_today,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [_dataNascimentoMask],
+                  borderColor: _dataColor,
+                  onChanged: _validateDate,
+                  validator: (val) {
+                    if (val == null || val.length != 10) return 'Data inválida';
+                    // Validação também no submit para garantir
+                    try {
+                      final parts = val.split('/');
+                      final d = int.parse(parts[0]);
+                      final m = int.parse(parts[1]);
+                      if (d > 31 || m > 12 || d < 1 || m < 1)
+                        return 'Data inválida';
+                    } catch (e) {
+                      return 'Data inválida';
+                    }
+                    return null;
+                  },
+                ),
+
+                // 4. CPF
                 CustomFormField(
                   controller: _cpfController,
                   label: 'CPF',
                   icon: Icons.badge,
                   keyboardType: TextInputType.number,
                   inputFormatters: [_cpfMask],
-                  validator: (val) {
-                    if (val == null || val.isEmpty) {
-                      return 'CPF é obrigatório';
-                    }
-                    if (val.length != 14) return 'CPF inválido';
-                    return null;
-                  },
+                  borderColor: _cpfColor,
+                  onChanged: _validateCPF,
+                  validator: (val) =>
+                      (val == null || val.length != 14) ? 'CPF Inválido' : null,
                 ),
-                // CORRIGIDO: Adicionado 'icon'
+
+                // 5. EMAIL
                 CustomFormField(
                   controller: _emailController,
                   label: 'E-MAIL',
                   icon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
+                  borderColor: _emailColor,
+                  onChanged: _validateEmail,
                   validator: MultiValidator([
-                    RequiredValidator(errorText: 'E-mail é obrigatório'),
-                    EmailValidator(errorText: 'Insira um e-mail válido')
+                    RequiredValidator(errorText: 'Obrigatório'),
+                    EmailValidator(errorText: 'Inválido')
                   ]).call,
                 ),
-                // CORRIGIDO: Adicionado 'icon'
+
+                // 6. CONFIRMA EMAIL
                 CustomFormField(
                   controller: _confirmEmailController,
                   label: 'CONFIRME O E-MAIL',
                   icon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
+                  borderColor: _confirmEmailColor,
+                  onChanged: _validateConfirmEmail,
                   validator: (val) =>
-                      MatchValidator(errorText: 'Os e-mails não são iguais')
+                      MatchValidator(errorText: 'E-mails não coincidem')
                           .validateMatch(val!, _emailController.text),
                 ),
-                // CORRIGIDO: Adicionado 'icon' e trocado 'obscureText' por 'isPassword'
+
+                // 7. SENHA (Validação: Complexa)
                 CustomFormField(
                   controller: _passwordController,
                   label: 'SENHA',
                   icon: Icons.lock,
                   isPassword: true,
-                  validator: MultiValidator([
-                    RequiredValidator(errorText: 'Senha é obrigatória'),
-                    MinLengthValidator(8, errorText: 'Mínimo 8 caracteres'),
-                  ]).call,
+                  borderColor: _passColor,
+                  onChanged: _validatePass,
+                  validator: (val) {
+                    if (val == null || val.isEmpty) return 'Obrigatória';
+                    final passwordRegex =
+                        RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$');
+                    if (!passwordRegex.hasMatch(val))
+                      return 'Mín 8 chars, 1 num, 1 maiús, 1 minús';
+                    return null;
+                  },
                 ),
-                // CORRIGIDO: Adicionado 'icon' e trocado 'obscureText' por 'isPassword'
+
+                // 8. CONFIRMA SENHA
                 CustomFormField(
                   controller: _confirmPasswordController,
                   label: 'CONFIRME A SENHA',
                   icon: Icons.lock_outline,
                   isPassword: true,
+                  borderColor: _confirmPassColor,
+                  onChanged: _validateConfirmPass,
                   validator: (val) =>
                       MatchValidator(errorText: 'Senhas não coincidem')
                           .validateMatch(val!, _passwordController.text),
@@ -357,17 +550,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            CheckboxListTile(
-              title: Text("Eu li e aceito os Termos de Serviço",
-                  style: GoogleFonts.poppins(fontSize: 14)),
-              value: _agreeToTerms,
-              onChanged: (newValue) {
-                setState(() {
-                  _agreeToTerms = newValue ?? false;
-                });
-              },
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: EdgeInsets.zero,
+            Theme(
+              data: ThemeData(unselectedWidgetColor: Colors.white70),
+              child: CheckboxListTile(
+                title: Text("Eu li e aceito os Termos de Serviço",
+                    style:
+                        GoogleFonts.poppins(fontSize: 14, color: Colors.white)),
+                value: _agreeToTerms,
+                onChanged: (newValue) =>
+                    setState(() => _agreeToTerms = newValue ?? false),
+                activeColor: AppColors.primary,
+                checkColor: Colors.white,
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
+              ),
             ),
             const SizedBox(height: 20),
             _isLoading
@@ -380,7 +576,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             TextButton(
               onPressed: () => Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => const LoginScreen())),
-              child: const Text('Já possui uma conta? Faça Login'),
+              child: const Text('Já possui uma conta? Faça Login',
+                  style: TextStyle(color: Colors.white70)),
             ),
           ]),
         ),
