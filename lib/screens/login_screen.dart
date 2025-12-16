@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-// Seus imports
+
 import 'package:erank_app/screens/signup_screen.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/services/auth_service.dart';
@@ -23,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  // Variáveis de controle de cor
   Color? _emailBorderColor;
   Color? _passwordBorderColor;
 
@@ -34,25 +33,23 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // Lógica do E-mail: Vermelho se incompleto, Verde se completo
   void _validateEmailLive(String value) {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     setState(() {
       if (value.isEmpty) {
-        _emailBorderColor = null; // Volta ao padrão se limpar
+        _emailBorderColor = null;
       } else if (emailRegex.hasMatch(value)) {
-        _emailBorderColor = Colors.greenAccent; // Válido
+        _emailBorderColor = Colors.greenAccent;
       } else {
-        _emailBorderColor = Colors.redAccent; // Digitando/Inválido
+        _emailBorderColor = Colors.redAccent;
       }
     });
   }
 
-  // Lógica da Senha: Limpa o vermelho quando o usuário começa a corrigir
   void _resetPasswordColor(String value) {
     if (_passwordBorderColor != null) {
       setState(() {
-        _passwordBorderColor = null; // Volta a cor padrão enquanto digita
+        _passwordBorderColor = null;
       });
     }
   }
@@ -77,11 +74,8 @@ class _LoginScreenState extends State<LoginScreen> {
         (Route<dynamic> route) => false,
       );
     } else {
-      // REGRA: Só fica vermelho quando erra a senha (login falhou)
       setState(() {
         _passwordBorderColor = Colors.red;
-        // Opcional: também pode deixar o email vermelho se quiser indicar erro geral
-        // _emailBorderColor = Colors.red;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +92,6 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: const Color(0xFF0F0C29),
       body: Stack(
         children: [
-          // Background
           Positioned.fill(
             child: Image.asset(
               'assets/background_neon.png',
@@ -107,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(color: const Color(0xFF141414)),
             ),
           ),
-
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -115,7 +107,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Título
                     Text(
                       'E-RANK',
                       style: GoogleFonts.bevan(
@@ -145,8 +136,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ]),
                     ),
                     const SizedBox(height: 40),
-
-                    // Container do Formulário
                     Container(
                       constraints: const BoxConstraints(maxWidth: 450),
                       padding: const EdgeInsets.all(24),
@@ -178,45 +167,36 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: TextStyle(color: Colors.white60),
                             ),
                             const SizedBox(height: 30),
-
-                            // 1. EMAIL (Validação visual ativa)
                             CustomFormField(
                               controller: _emailController,
                               label: 'E-mail',
                               icon: Icons.email_outlined,
                               keyboardType: TextInputType.emailAddress,
-                              borderColor: _emailBorderColor, // Cor dinâmica
-                              onChanged:
-                                  _validateEmailLive, // Checa enquanto digita
+                              borderColor: _emailBorderColor,
+                              onChanged: _validateEmailLive,
                               validator: MultiValidator([
                                 RequiredValidator(errorText: 'Obrigatório'),
                                 EmailValidator(errorText: 'E-mail inválido')
                               ]).call,
                             ),
                             const SizedBox(height: 20),
-
-                            // 2. SENHA (Só fica vermelho no erro de login)
                             CustomFormField(
                               controller: _passwordController,
                               label: 'Senha',
                               icon: Icons.lock_outline,
                               isPassword: true,
-                              borderColor: _passwordBorderColor, // Cor dinâmica
-                              onChanged:
-                                  _resetPasswordColor, // Limpa o vermelho ao digitar de novo
+                              borderColor: _passwordBorderColor,
+                              onChanged: _resetPasswordColor,
                               validator:
                                   RequiredValidator(errorText: 'Obrigatória')
                                       .call,
                             ),
-
                             const SizedBox(height: 30),
                             PrimaryButton(
                               text: 'LOGIN',
                               isLoading: _isLoading,
                               onPressed: _loginUser,
                             ),
-
-                            // Links e Redes Sociais
                             Padding(
                               padding: const EdgeInsets.only(
                                   top: 20.0, bottom: 30.0),
