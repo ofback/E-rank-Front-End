@@ -36,7 +36,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isLoading = false;
   bool _agreeToTerms = false;
 
-  // --- CORES DAS BORDAS ---
   Color? _nomeColor;
   Color? _nickColor;
   Color? _dataColor;
@@ -59,11 +58,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  // ==========================================================
-  // LÓGICA DE VALIDAÇÃO VISUAL (BORDAS VERDES/VERMELHAS)
-  // ==========================================================
-
-  // 1. NOME COMPLETO: Pelo menos dois nomes
   void _validateNome(String val) {
     setState(() {
       if (val.isEmpty) {
@@ -76,7 +70,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  // 2. NICKNAME: Mínimo 2 caracteres
   void _validateNick(String val) {
     setState(() {
       if (val.isEmpty) {
@@ -89,7 +82,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  // 3. DATA: Dia <= 31 e Mês <= 12
   void _validateDate(String val) {
     setState(() {
       if (val.isEmpty) {
@@ -98,13 +90,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
 
       if (val.length != 10) {
-        _dataColor = Colors.redAccent; // Incompleto
+        _dataColor = Colors.redAccent;
         return;
       }
 
-      // Validação logica
       try {
-        final parts = val.split('/'); // Ex: ["15", "05", "2000"]
+        final parts = val.split('/');
         final day = int.parse(parts[0]);
         final month = int.parse(parts[1]);
         final year = int.parse(parts[2]);
@@ -120,7 +111,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  // CPF (Apenas tamanho por enquanto)
   void _validateCPF(String val) {
     setState(() {
       if (val.isEmpty)
@@ -132,7 +122,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  // Email Regex
   void _validateEmail(String val) {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     setState(() {
@@ -145,7 +134,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  // Confirmação Email
   void _validateConfirmEmail(String val) {
     setState(() {
       if (val.isEmpty)
@@ -159,13 +147,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  // 4. SENHA FORTE: 8 chars, maiuscula, minuscula, numero
   void _validatePass(String val) {
-    // Regex:
-    // (?=.*[A-Z]) -> Tem maiúscula
-    // (?=.*[a-z]) -> Tem minúscula
-    // (?=.*[0-9]) -> Tem número
-    // .{8,}       -> Mínimo 8 caracteres
     final passwordRegex = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$');
 
     setState(() {
@@ -179,7 +161,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  // Confirmação Senha
   void _validateConfirmPass(String val) {
     setState(() {
       if (val.isEmpty)
@@ -190,10 +171,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _confirmPassColor = Colors.redAccent;
     });
   }
-
-  // ==========================================================
-  // CADASTRO
-  // ==========================================================
 
   Future<void> _registerUser() async {
     if (!_formKey.currentState!.validate()) return;
@@ -288,7 +265,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: isLargeScreen
             ? Row(
                 children: [
-                  // Esquerda
                   Expanded(
                     flex: 1,
                     child: Container(
@@ -423,7 +399,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               mainAxisSpacing: 20,
               childAspectRatio: childAspectRatio,
               children: [
-                // 1. NOME (Validação: 2 nomes)
                 CustomFormField(
                   controller: _nomeController,
                   label: 'NOME COMPLETO',
@@ -438,7 +413,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
 
-                // 2. NICK (Validação: min 2 chars)
                 CustomFormField(
                   controller: _nicknameController,
                   label: 'NICKNAME',
@@ -452,7 +426,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
 
-                // 3. DATA (Validação: Logica dia/mês)
                 CustomFormField(
                   controller: _dataNascimentoController,
                   label: 'NASCIMENTO',
@@ -463,7 +436,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onChanged: _validateDate,
                   validator: (val) {
                     if (val == null || val.length != 10) return 'Data inválida';
-                    // Validação também no submit para garantir
+
                     try {
                       final parts = val.split('/');
                       final d = int.parse(parts[0]);
@@ -477,7 +450,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
 
-                // 4. CPF
                 CustomFormField(
                   controller: _cpfController,
                   label: 'CPF',
@@ -490,7 +462,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       (val == null || val.length != 14) ? 'CPF Inválido' : null,
                 ),
 
-                // 5. EMAIL
                 CustomFormField(
                   controller: _emailController,
                   label: 'E-MAIL',
@@ -504,7 +475,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ]).call,
                 ),
 
-                // 6. CONFIRMA EMAIL
                 CustomFormField(
                   controller: _confirmEmailController,
                   label: 'CONFIRME O E-MAIL',
@@ -517,7 +487,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           .validateMatch(val!, _emailController.text),
                 ),
 
-                // 7. SENHA (Validação: Complexa)
                 CustomFormField(
                   controller: _passwordController,
                   label: 'SENHA',

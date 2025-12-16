@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:form_field_validator/form_field_validator.dart'; // Importante para validação
+import 'package:form_field_validator/form_field_validator.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/widgets/primary_button.dart';
@@ -13,11 +13,10 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final _formKey = GlobalKey<FormState>(); // Chave para validar o formulário
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _isLoading = false;
 
-  // Variável para a cor da borda (Validação Visual)
   Color? _emailBorderColor;
 
   @override
@@ -26,31 +25,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  // --- VALIDAÇÃO EM TEMPO REAL (Igual ao Login) ---
   void _validateEmailLive(String value) {
-    // Regex para e-mail
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
     setState(() {
       if (value.isEmpty) {
-        _emailBorderColor = null; // Neutro
+        _emailBorderColor = null;
       } else if (emailRegex.hasMatch(value)) {
-        _emailBorderColor = Colors.greenAccent; // Válido
+        _emailBorderColor = Colors.greenAccent;
       } else {
-        _emailBorderColor = Colors.redAccent; // Inválido
+        _emailBorderColor = Colors.redAccent;
       }
     });
   }
 
   void _sendRecoveryEmail() {
-    // 1. Verifica se o formulário está válido antes de enviar
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     setState(() => _isLoading = true);
 
-    // Simulação de envio (mantenha sua lógica ou conecte ao AuthService aqui)
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
 
@@ -58,24 +53,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          backgroundColor: Colors.green, // Verde sucesso
+          backgroundColor: Colors.green,
           content:
               Text('Se o e-mail existir, enviamos um link de recuperação.'),
         ),
       );
 
-      Navigator.of(context).pop(); // Volta para o login
+      Navigator.of(context).pop();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Fundo base escuro (segurança)
       backgroundColor: const Color(0xFF0F0C29),
       body: Stack(
         children: [
-          // 1. IMAGEM DE FUNDO NEON
           Positioned.fill(
             child: Image.asset(
               'assets/background_neon.png',
@@ -84,8 +77,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Container(color: const Color(0xFF141414)),
             ),
           ),
-
-          // 2. CONTEÚDO
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -93,12 +84,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // TÍTULO E-RANK (Fonte Bevan igual ao Login)
                     Text(
                       'E-RANK',
                       style: GoogleFonts.bevan(
-                          fontSize:
-                              54, // Um pouco menor que o login para caber bem
+                          fontSize: 54,
                           color: Colors.white,
                           letterSpacing: 3.0,
                           shadows: [
@@ -125,8 +114,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ]),
                     ),
                     const SizedBox(height: 40),
-
-                    // 3. CARTÃO (Card escuro translúcido)
                     Container(
                       constraints: const BoxConstraints(maxWidth: 450),
                       padding: const EdgeInsets.all(32),
@@ -165,17 +152,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               ),
                             ),
                             const SizedBox(height: 30),
-
-                            // CAMPO E-MAIL (Com validação visual)
                             CustomFormField(
                               controller: _emailController,
                               label: 'E-MAIL',
                               icon: Icons.email_outlined,
                               keyboardType: TextInputType.emailAddress,
-                              borderColor:
-                                  _emailBorderColor, // Cor dinâmica (verde/vermelho)
-                              onChanged:
-                                  _validateEmailLive, // Valida ao digitar
+                              borderColor: _emailBorderColor,
+                              onChanged: _validateEmailLive,
                               validator: MultiValidator([
                                 RequiredValidator(
                                     errorText: 'O e-mail é obrigatório'),
@@ -183,19 +166,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     errorText: 'Insira um e-mail válido'),
                               ]).call,
                             ),
-
                             const SizedBox(height: 30),
-
-                            // BOTÃO ENVIAR
                             PrimaryButton(
                               text: 'ENVIAR RECUPERAÇÃO',
                               isLoading: _isLoading,
                               onPressed: _sendRecoveryEmail,
                             ),
-
                             const SizedBox(height: 20),
-
-                            // BOTÃO VOLTAR
                             TextButton.icon(
                               onPressed: () => Navigator.of(context).pop(),
                               icon: const Icon(Icons.arrow_back,
