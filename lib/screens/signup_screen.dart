@@ -265,7 +265,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               mainAxisSpacing: 20,
               childAspectRatio: childAspectRatio,
               children: [
-                // CORRIGIDO: Adicionado 'icon'
                 CustomFormField(
                   controller: _nomeController,
                   label: 'NOME COMPLETO',
@@ -273,7 +272,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   validator:
                       RequiredValidator(errorText: 'Nome é obrigatório').call,
                 ),
-                // CORRIGIDO: Adicionado 'icon'
                 CustomFormField(
                   controller: _nicknameController,
                   label: 'NICKNAME (APELIDO)',
@@ -282,7 +280,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       RequiredValidator(errorText: 'Nickname é obrigatório')
                           .call,
                 ),
-                // CORRIGIDO: Adicionado 'icon'
                 CustomFormField(
                   controller: _dataNascimentoController,
                   label: 'DATA DE NASCIMENTO',
@@ -297,7 +294,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   },
                 ),
-                // CORRIGIDO: Adicionado 'icon'
                 CustomFormField(
                   controller: _cpfController,
                   label: 'CPF',
@@ -312,7 +308,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   },
                 ),
-                // CORRIGIDO: Adicionado 'icon'
                 CustomFormField(
                   controller: _emailController,
                   label: 'E-MAIL',
@@ -323,7 +318,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     EmailValidator(errorText: 'Insira um e-mail válido')
                   ]).call,
                 ),
-                // CORRIGIDO: Adicionado 'icon'
                 CustomFormField(
                   controller: _confirmEmailController,
                   label: 'CONFIRME O E-MAIL',
@@ -333,7 +327,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       MatchValidator(errorText: 'Os e-mails não são iguais')
                           .validateMatch(val!, _emailController.text),
                 ),
-                // CORRIGIDO: Adicionado 'icon' e trocado 'obscureText' por 'isPassword'
                 CustomFormField(
                   controller: _passwordController,
                   label: 'SENHA',
@@ -344,7 +337,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     MinLengthValidator(8, errorText: 'Mínimo 8 caracteres'),
                   ]).call,
                 ),
-                // CORRIGIDO: Adicionado 'icon' e trocado 'obscureText' por 'isPassword'
                 CustomFormField(
                   controller: _confirmPasswordController,
                   label: 'CONFIRME A SENHA',

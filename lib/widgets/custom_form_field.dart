@@ -5,11 +5,9 @@ import 'package:erank_app/core/theme/app_colors.dart';
 class CustomFormField extends StatefulWidget {
   final TextEditingController? controller;
   final String label;
-  final IconData
-      icon; // Adicionado para manter compatibilidade com seu design anterior
+  final IconData icon;
   final String? Function(String?)? validator;
-  final bool
-      isPassword; // Renomeado de obscureText para clareza (padrão anterior)
+  final bool isPassword;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLines;
@@ -31,7 +29,6 @@ class CustomFormField extends StatefulWidget {
 }
 
 class _CustomFormFieldState extends State<CustomFormField> {
-  // Controla a visibilidade da senha internamente
   bool _isObscured = true;
 
   @override
@@ -39,7 +36,6 @@ class _CustomFormFieldState extends State<CustomFormField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Rótulo acima do campo
         Text(
           widget.label,
           style: const TextStyle(
@@ -50,10 +46,8 @@ class _CustomFormFieldState extends State<CustomFormField> {
           ),
         ),
         const SizedBox(height: 8),
-
         Container(
           decoration: BoxDecoration(
-            // Fundo escuro translúcido para destacar o campo do background da tela
             // ignore: deprecated_member_use
             color: AppColors.black87.withOpacity(0.3),
             borderRadius: BorderRadius.circular(12),
@@ -65,27 +59,19 @@ class _CustomFormFieldState extends State<CustomFormField> {
             keyboardType: widget.keyboardType,
             inputFormatters: widget.inputFormatters,
             maxLines: widget.isPassword ? 1 : widget.maxLines,
-
-            // Lógica: Se não for campo de senha, nunca obscurece.
-            // Se for senha, obedece a variável de estado _isObscured.
             obscureText: widget.isPassword ? _isObscured : false,
-
-            // --- ESTILO DO TEXTO DIGITADO (Correção de Visibilidade) ---
             style: const TextStyle(
-              color: Colors.white, // Texto BRANCO para contraste máximo
-              fontWeight: FontWeight.w600, // Semi-negrito para legibilidade
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
               fontSize: 16,
               letterSpacing: 0.5,
             ),
             cursorColor: AppColors.primary,
-
             decoration: InputDecoration(
               prefixIcon: Icon(widget.icon, color: AppColors.white54),
               border: InputBorder.none,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-
-              // Ícone de Olho (Apenas se for senha)
               suffixIcon: widget.isPassword
                   ? IconButton(
                       icon: Icon(
@@ -99,7 +85,6 @@ class _CustomFormFieldState extends State<CustomFormField> {
                       },
                     )
                   : null,
-
               errorStyle: const TextStyle(
                 color: AppColors.red,
                 fontWeight: FontWeight.bold,

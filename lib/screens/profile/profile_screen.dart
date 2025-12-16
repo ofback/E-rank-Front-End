@@ -90,8 +90,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     )
                         .then((_) {
-                      // Este código executa quando a tela de edição é fechada.
-                      // Chamar setState() força o FutureBuilder a rodar novamente.
                       setState(() {});
                     });
                   },

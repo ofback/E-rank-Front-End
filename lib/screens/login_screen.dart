@@ -81,8 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: AppColors.white,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 40),
-
-                    // --- CORREÇÃO 1: Adicionado icon ---
                     CustomFormField(
                       controller: _emailController,
                       label: 'E-mail',
@@ -94,18 +92,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ]).call,
                     ),
                     const SizedBox(height: 20),
-
-                    // --- CORREÇÃO 2: Adicionado icon e mudado obscureText para isPassword ---
                     CustomFormField(
                       controller: _passwordController,
                       label: 'Senha',
-                      icon: Icons.lock, // Ícone obrigatório
-                      isPassword: true, // Nome atualizado
+                      icon: Icons.lock,
+                      isPassword: true,
                       validator:
                           RequiredValidator(errorText: 'Senha é obrigatória')
                               .call,
                     ),
-
                     const SizedBox(height: 40),
                     PrimaryButton(
                       text: 'LOGIN',

@@ -26,7 +26,6 @@ class PlayerCardWidget extends StatelessWidget {
         border: Border.all(color: const Color(0xFF7F5AF0), width: 2),
         boxShadow: [
           BoxShadow(
-            // CORREÇÃO AQUI:
             color: const Color(0xFF7F5AF0).withValues(alpha: 0.5),
             blurRadius: 20,
             spreadRadius: 2,

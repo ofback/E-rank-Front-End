@@ -2,7 +2,6 @@ import 'package:erank_app/services/api_client.dart';
 import 'package:erank_app/models/player_card.dart';
 
 class EstatisticasService {
-  // Registrar o resultado de uma partida
   static Future<bool> registrarResultado({
     required int desafioId,
     required bool vitoria,
@@ -21,15 +20,13 @@ class EstatisticasService {
         'deaths': deaths,
         'assistencias': assists,
         'headshots': headshots,
-        'dadosExtras': 'Registrado via App' // Campo opcional
+        'dadosExtras': 'Registrado via App'
       };
 
       final response = await ApiClient.post('/estatisticas', body: body);
-      ApiClient.handleResponse(response); // Lança exceção se der erro
+      ApiClient.handleResponse(response);
       return true;
     } catch (e) {
-      // Você pode relançar o erro ou tratar aqui.
-      // Recomendo relançar para a tela mostrar o Snackbar.
       rethrow;
     }
   }

@@ -1,7 +1,7 @@
 class Challenge {
   final int id;
   final String desafianteNome;
-  final String status; // 'P' (Pendente), 'A', 'R', etc.
+  final String status;
   final String dataHora;
 
   Challenge({

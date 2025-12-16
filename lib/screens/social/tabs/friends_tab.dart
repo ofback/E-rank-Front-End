@@ -52,15 +52,14 @@ class _FriendsTabState extends State<FriendsTab> {
               const Divider(color: Colors.white10),
           itemBuilder: (context, index) {
             final friend = friends[index];
-            // Garante que estamos pegando os IDs corretos do DTO (FriendDTO)
+
             final int friendUserId = friend['userId'] ?? 0;
-            // O campo de ID da amizade no DTO é 'friendshipId'
+
             final int friendshipId =
                 friend['friendshipId'] ?? friend['id'] ?? 0;
 
             return ListTile(
               leading: CircleAvatar(
-                // Uso de .withValues para evitar warning de deprecated em versões novas do Flutter
                 backgroundColor: AppColors.primary.withValues(alpha: 0.2),
                 child: Text(
                   (friend['nickname'] ?? '?')[0].toUpperCase(),
@@ -71,17 +70,13 @@ class _FriendsTabState extends State<FriendsTab> {
                 friend['nickname'] ?? 'Sem Nickname',
                 style: const TextStyle(color: AppColors.white),
               ),
-              // Se quiser mostrar o nome real também:
-              // subtitle: Text(friend['nome'] ?? '', style: TextStyle(color: Colors.white54)),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // --- Botão de Desafiar (Fluxo RF23) ---
                   IconButton(
                     tooltip: 'Desafiar',
                     icon: const Icon(Icons.flash_on, color: Colors.amber),
                     onPressed: () {
-                      // Navega para a tela de criação JÁ COM O AMIGO SELECIONADO
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -92,16 +87,15 @@ class _FriendsTabState extends State<FriendsTab> {
                       );
                     },
                   ),
-                  // --- Menu de Opções (Ex: Remover Amigo) ---
                   PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert, color: AppColors.white54),
                     onSelected: (value) async {
                       if (value == 'remove') {
                         final success =
                             await SocialService.declineOrRemoveFriendship(
-                                friendshipId); // Usa o ID da amizade
+                                friendshipId);
                         if (success) {
-                          _loadFriends(); // Atualiza a lista
+                          _loadFriends();
                         }
                       }
                     },
