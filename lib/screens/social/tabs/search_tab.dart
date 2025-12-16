@@ -14,7 +14,7 @@ class _SearchTabState extends State<SearchTab> {
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
-  bool _hasSearched = false; // Variável para controlar se a busca já foi feita
+  bool _hasSearched = false;
   int? _currentUserId;
 
   @override
@@ -37,8 +37,8 @@ class _SearchTabState extends State<SearchTab> {
 
     setState(() {
       _isLoading = true;
-      _hasSearched = true; // Marca que o usuário tentou buscar
-      _searchResults = []; // Limpa resultados anteriores
+      _hasSearched = true;
+      _searchResults = [];
     });
 
     final results = await SocialService.searchUsers(query);
@@ -102,8 +102,8 @@ class _SearchTabState extends State<SearchTab> {
                   ? Center(
                       child: Text(
                         _hasSearched
-                            ? 'Nenhum usuário encontrado.' // Exibe se já buscou e a lista tá vazia
-                            : 'Digite para buscar...', // Exibe se ainda não buscou nada
+                            ? 'Nenhum usuário encontrado.'
+                            : 'Digite para buscar...',
                         style: const TextStyle(color: AppColors.white54),
                       ),
                     )

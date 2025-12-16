@@ -40,7 +40,6 @@ class _CreateChallengeScreenState extends State<CreateChallengeScreen> {
           _friends = friends;
           _games = games;
 
-          // Validação: Se o ID passado não estiver na lista, limpa a seleção
           if (_selectedFriendId != null) {
             final friendExists = _friends
                 .any((f) => (f['userId'] ?? f['id']) == _selectedFriendId);
@@ -109,7 +108,6 @@ class _CreateChallengeScreenState extends State<CreateChallengeScreen> {
                           fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   DropdownButtonFormField<int>(
-                    // CORREÇÃO: 'value' -> 'initialValue'
                     initialValue: _selectedFriendId,
                     dropdownColor: AppColors.surface,
                     style: const TextStyle(color: Colors.white),
@@ -137,7 +135,6 @@ class _CreateChallengeScreenState extends State<CreateChallengeScreen> {
                           fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   DropdownButtonFormField<int>(
-                    // CORREÇÃO: 'value' -> 'initialValue'
                     initialValue: _selectedGameId,
                     dropdownColor: AppColors.surface,
                     style: const TextStyle(color: Colors.white),

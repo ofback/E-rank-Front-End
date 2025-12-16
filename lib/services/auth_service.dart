@@ -4,7 +4,6 @@ import 'package:erank_app/services/auth_storage.dart';
 import 'package:flutter/foundation.dart';
 
 class AuthService {
-  // REGISTRO
   static Future<bool> register(Map<String, String> user) async {
     try {
       final response = await ApiClient.post('/usuarios', body: user);
@@ -15,7 +14,6 @@ class AuthService {
     }
   }
 
-  // LOGIN
   static Future<bool> login(String email, String password) async {
     try {
       final response = await ApiClient.post('/login',
@@ -44,7 +42,6 @@ class AuthService {
     }
   }
 
-  // LOGOUT
   static Future<void> logout() async {
     await AuthStorage.logout();
   }

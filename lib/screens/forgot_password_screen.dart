@@ -58,15 +58,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-
-                // --- CORREÇÃO: Adicionado icon ---
                 CustomFormField(
                   controller: _emailController,
                   label: 'E-mail',
-                  icon: Icons.email, // Ícone obrigatório
+                  icon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                 ),
-
                 const SizedBox(height: 30),
                 PrimaryButton(
                   text: 'ENVIAR',

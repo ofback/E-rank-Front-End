@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:erank_app/services/team_service.dart';
-// REMOVIDO: import 'package:erank_app/services/api_client.dart';
 
 class CreateTeamScreen extends StatefulWidget {
   const CreateTeamScreen({super.key});
@@ -53,7 +52,6 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
 
       if (!mounted) return;
 
-      // Sucesso
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: AppColors.green,
@@ -63,7 +61,7 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
       Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
-      // Erro
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppColors.red,

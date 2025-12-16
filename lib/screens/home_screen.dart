@@ -51,10 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          // 1. Botão de Ranking (NOVO)
           IconButton(
-            icon: const Icon(Icons.emoji_events,
-                color: Colors.amber), // Ícone de Troféu
+            icon: const Icon(Icons.emoji_events, color: Colors.amber),
             tooltip: 'Ver Ranking',
             onPressed: () {
               Navigator.push(
@@ -63,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // 2. Botão de Desafios Pendentes
           IconButton(
             icon: const Icon(Icons.sports_kabaddi, color: Colors.white),
             tooltip: 'Desafios Pendentes',
@@ -75,7 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // 3. Botão de Partidas Ativas
           IconButton(
             icon: const Icon(Icons.sports_esports, color: Colors.white),
             tooltip: 'Minhas Partidas',
@@ -87,7 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // 4. Botão de Estatísticas
           IconButton(
             icon: const Icon(Icons.bar_chart, color: Colors.white),
             tooltip: 'Minhas Estatísticas',
@@ -98,7 +93,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // 5. Logout
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sair',

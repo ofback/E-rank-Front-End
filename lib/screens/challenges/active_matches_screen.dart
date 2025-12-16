@@ -80,7 +80,6 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
                     'Data: ${challenge.dataHora}',
                     style: const TextStyle(color: Colors.white54),
                   ),
-                  // CORREÇÃO AQUI: Layout mais compacto para evitar overflow
                   trailing: jaRegistrei
                       ? Container(
                           padding: const EdgeInsets.symmetric(
@@ -99,8 +98,7 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
                       : ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12), // Reduz padding do botão
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                           ),
                           onPressed: () async {
                             await Navigator.push(

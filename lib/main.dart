@@ -3,7 +3,6 @@ import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/navigation/auth_wrapper.dart';
 
 void main() {
-  // GARANTE QUE OS PLUGINS (COMO STORAGE) ESTEJAM PRONTOS ANTES DO APP INICIAR
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(const MyApp());
