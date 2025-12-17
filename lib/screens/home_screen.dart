@@ -2,7 +2,7 @@ import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/screens/challenges/active_matches_screen.dart';
 import 'package:erank_app/screens/challenges/challenges_list_screen.dart';
 import 'package:erank_app/screens/challenges/create_challenge_screen.dart';
-import 'package:erank_app/screens/ranking/ranking_screen.dart'; // NOVO IMPORT
+import 'package:erank_app/screens/ranking/ranking_screen.dart';
 import 'package:erank_app/screens/stats/stats_screen.dart';
 import 'package:erank_app/screens/teams/team_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -44,64 +44,47 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       primary: false,
       resizeToAvoidBottomInset: false,
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('E-Rank', style: TextStyle(color: Colors.white)),
-        backgroundColor: AppColors.background,
+        title: Text(
+          'E-RANK',
+          style: GoogleFonts.bevan(
+            fontSize: 28,
+            color: Colors.white,
+            letterSpacing: 1.5,
+          ),
+        ),
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.emoji_events, color: Colors.amber),
-            tooltip: 'Ver Ranking',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const RankingScreen()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.sports_kabaddi, color: Colors.white),
-            tooltip: 'Desafios Pendentes',
-            onPressed: () {
-              Navigator.push(
+          _buildActionButton(Icons.emoji_events, Colors.amber, 'Ranking', () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const RankingScreen()));
+          }),
+          _buildActionButton(
+              Icons.sports_kabaddi, Colors.blueAccent, 'Desafios', () {
+            Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const ChallengesListScreen()),
-              );
-            },
-          ),
+                    builder: (_) => const ChallengesListScreen()));
+          }),
+          _buildActionButton(
+              Icons.sports_esports, Colors.greenAccent, 'Partidas', () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const ActiveMatchesScreen()));
+          }),
+          _buildActionButton(Icons.bar_chart, Colors.purpleAccent, 'Stats', () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const StatsScreen()));
+          }),
           IconButton(
-            icon: const Icon(Icons.sports_esports, color: Colors.white),
-            tooltip: 'Minhas Partidas',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const ActiveMatchesScreen()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.bar_chart, color: Colors.white),
-            tooltip: 'Minhas Estatísticas',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const StatsScreen()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white54),
             tooltip: 'Sair',
             onPressed: () async {
               await AuthStorage.logout();
-              if (context.mounted) {
-                // Redirecionar para login se necessário, ou apenas atualizar o estado
-                // Navigator.of(context).pushReplacementNamed('/login');
-              }
+              // Lógica de redirecionamento ou refresh pode ser adicionada aqui
             },
           ),
         ],
@@ -110,13 +93,14 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
             child: Text(
               'Meus Times',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(color: AppColors.white),
+              style: GoogleFonts.exo2(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white70,
+                  letterSpacing: 1),
             ),
           ),
           Expanded(
@@ -126,139 +110,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                      child: Text('Você ainda não faz parte de um time.',
-                          style: TextStyle(color: AppColors.white54)));
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.group_off_outlined,
+                            size: 60,
+                            color: Colors.white.withValues(alpha: 0.3)),
+                        const SizedBox(height: 10),
+                        Text('Você ainda não faz parte de um time.',
+                            style: GoogleFonts.poppins(color: Colors.white54)),
+                      ],
+                    ),
+                  );
                 }
 
                 final myTeams = snapshot.data!;
 
                 return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: myTeams.length,
                   itemBuilder: (context, index) {
                     final team = myTeams[index];
-                    final int teamId = team['id'] ?? 0;
-                    final String teamName = team['nome'] ?? 'Sem Nome';
-                    final String teamCargo = team['cargo'] ?? 'Membro';
-                    final String teamStatus = team['status'] ?? 'P';
-
-                    return Card(
-                      color: AppColors.surface,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          if (teamStatus == 'A') {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    TeamDetailsScreen(team: team),
-                              ),
-                            ).then((_) => _loadMyTeams());
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Aceite o convite primeiro.")),
-                            );
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      teamName,
-                                      style: GoogleFonts.inter(
-                                        color: AppColors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  if (teamStatus == 'A')
-                                    IconButton(
-                                      icon: const Icon(Icons.exit_to_app,
-                                          color: Colors.red),
-                                      onPressed: () => _showLeaveTeamDialog(
-                                          context, teamId, teamName),
-                                    ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              if (teamStatus == 'A') ...[
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    'Cargo: $teamCargo',
-                                    style: const TextStyle(
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ] else ...[
-                                const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text('Convite Pendente',
-                                      style: TextStyle(color: Colors.orange)),
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.green),
-                                        onPressed: () async {
-                                          try {
-                                            await TeamService.respondInvite(
-                                                teamId, true);
-                                            _loadMyTeams();
-                                          } catch (e) {
-                                            _showError(e.toString());
-                                          }
-                                        },
-                                        child: const Text("Aceitar",
-                                            style:
-                                                TextStyle(color: Colors.white)),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        style: OutlinedButton.styleFrom(
-                                            side: const BorderSide(
-                                                color: Colors.red)),
-                                        onPressed: () async {
-                                          try {
-                                            await TeamService.respondInvite(
-                                                teamId, false);
-                                            _loadMyTeams();
-                                          } catch (e) {
-                                            _showError(e.toString());
-                                          }
-                                        },
-                                        child: const Text("Recusar",
-                                            style:
-                                                TextStyle(color: Colors.red)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ]
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
+                    return _buildTeamCard(team);
                   },
                 );
               },
@@ -275,8 +149,162 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
         backgroundColor: AppColors.primary,
+        elevation: 10,
         icon: const Icon(Icons.flash_on, color: Colors.white),
-        label: const Text('Desafiar', style: TextStyle(color: Colors.white)),
+        label: Text('DESAFIAR',
+            style: GoogleFonts.exo2(
+                color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+      IconData icon, Color color, String tooltip, VoidCallback onTap) {
+    return IconButton(
+      icon: Icon(icon, color: color),
+      tooltip: tooltip,
+      onPressed: onTap,
+    );
+  }
+
+  Widget _buildTeamCard(dynamic team) {
+    final int teamId = team['id'] ?? 0;
+    final String teamName = team['nome'] ?? 'Sem Nome';
+    final String teamCargo = team['cargo'] ?? 'Membro';
+    final String teamStatus = team['status'] ?? 'P';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E2C).withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            if (teamStatus == 'A') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TeamDetailsScreen(team: team),
+                ),
+              ).then((_) => _loadMyTeams());
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Aceite o convite primeiro.")),
+              );
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.shield,
+                          color: Colors.blueAccent, size: 24),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            teamName,
+                            style: GoogleFonts.exo2(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            teamStatus == 'A'
+                                ? teamCargo.toUpperCase()
+                                : 'PENDENTE',
+                            style: GoogleFonts.poppins(
+                                color: teamStatus == 'A'
+                                    ? Colors.white54
+                                    : Colors.orangeAccent,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (teamStatus == 'A')
+                      IconButton(
+                        icon: const Icon(Icons.exit_to_app,
+                            color: Colors.redAccent),
+                        onPressed: () =>
+                            _showLeaveTeamDialog(context, teamId, teamName),
+                      ),
+                  ],
+                ),
+                if (teamStatus != 'A') ...[
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Colors.green.withValues(alpha: 0.8),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8))),
+                          onPressed: () async {
+                            try {
+                              await TeamService.respondInvite(teamId, true);
+                              _loadMyTeams();
+                            } catch (e) {
+                              _showError(e.toString());
+                            }
+                          },
+                          child: const Text("Aceitar",
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Colors.redAccent),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8))),
+                          onPressed: () async {
+                            try {
+                              await TeamService.respondInvite(teamId, false);
+                              _loadMyTeams();
+                            } catch (e) {
+                              _showError(e.toString());
+                            }
+                          },
+                          child: const Text("Recusar",
+                              style: TextStyle(color: Colors.redAccent)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ]
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -286,22 +314,26 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          backgroundColor: AppColors.surface,
-          title:
-              const Text('Sair do Time', style: TextStyle(color: Colors.white)),
-          content: Text('Sair de "$teamName"?',
-              style: const TextStyle(color: Colors.white70)),
+          backgroundColor: const Color(0xFF1E1E2C),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text('Sair do Time',
+              style: GoogleFonts.exo2(color: Colors.white)),
+          content: Text('Tem certeza que deseja sair de "$teamName"?',
+              style: GoogleFonts.poppins(color: Colors.white70)),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancelar'),
+              child: const Text('Cancelar',
+                  style: TextStyle(color: Colors.white54)),
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             TextButton(
-              child: const Text('Sair', style: TextStyle(color: Colors.red)),
+              child: const Text('SAIR',
+                  style: TextStyle(
+                      color: Colors.redAccent, fontWeight: FontWeight.bold)),
               onPressed: () async {
                 final userId = await AuthStorage.getUserId();
                 if (userId == null) return;
-
                 try {
                   await TeamService.removeMember(teamId, userId);
                   if (dialogContext.mounted) {
@@ -312,9 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (dialogContext.mounted) {
                     Navigator.of(dialogContext).pop();
                   }
-                  if (mounted) {
-                    _showError('Erro ao sair do time: $e');
-                  }
+                  if (mounted) _showError('Erro: $e');
                 }
               },
             ),
