@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/widgets/primary_button.dart';
 
@@ -118,12 +117,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       constraints: const BoxConstraints(maxWidth: 450),
                       padding: const EdgeInsets.all(32),
                       decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E2C).withOpacity(0.90),
+                          color:
+                              const Color(0xFF1E1E2C).withValues(alpha: 0.90),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(color: Colors.white24, width: 1),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.6),
+                              color: Colors.black.withValues(alpha: 0.6),
                               blurRadius: 25,
                               spreadRadius: 5,
                             )
