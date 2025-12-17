@@ -140,12 +140,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       constraints: const BoxConstraints(maxWidth: 450),
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E2C).withOpacity(0.90),
+                          color:
+                              const Color(0xFF1E1E2C).withValues(alpha: 0.90),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(color: Colors.white24, width: 1),
                           boxShadow: [
                             BoxShadow(
-                                color: Colors.black.withOpacity(0.6),
+                                color: Colors.black.withValues(alpha: 0.6),
                                 blurRadius: 25,
                                 spreadRadius: 5)
                           ]),
@@ -257,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
       width: 55,
       height: 55,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white24),
       ),
