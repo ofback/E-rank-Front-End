@@ -87,12 +87,8 @@ class _RegisterResultScreenState extends State<RegisterResultScreen> {
                     style:
                         TextStyle(color: _vitoria ? Colors.green : Colors.red)),
                 value: _vitoria,
-
-                // CORREÇÃO FINAL: Substituído activeColor por activeThumbColor
-                activeTrackColor: Colors.green, // Cor do trilho quando ligado
-                activeThumbColor: Colors
-                    .white, // Cor da bolinha quando ligado (Substituto do activeColor)
-
+                activeTrackColor: Colors.green,
+                activeThumbColor: Colors.white,
                 onChanged: (val) => setState(() => _vitoria = val),
               ),
               const Divider(color: Colors.white24),

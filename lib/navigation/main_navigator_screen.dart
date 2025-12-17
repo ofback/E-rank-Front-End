@@ -14,10 +14,9 @@ class MainNavigatorScreen extends StatefulWidget {
 class _MainNavigatorScreenState extends State<MainNavigatorScreen> {
   int _selectedIndex = 0;
 
-  // Removido 'const' pois os widgets podem não ser const
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
-    const SocialScreen(), // Garanta que SocialScreen tem construtor const
+    const SocialScreen(),
     const ProfileScreen(),
   ];
 

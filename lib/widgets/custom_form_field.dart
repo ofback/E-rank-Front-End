@@ -12,9 +12,9 @@ class CustomFormField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLines;
 
-  // --- NOVOS PARÂMETROS ---
-  final Function(String)? onChanged; // Para detectar digitação em tempo real
-  final Color? borderColor; // Para mudar a cor da borda externamente
+  
+  final Function(String)? onChanged; 
+  final Color? borderColor; 
 
   const CustomFormField({
     super.key,
@@ -26,8 +26,8 @@ class CustomFormField extends StatefulWidget {
     this.keyboardType,
     this.inputFormatters,
     this.maxLines = 1,
-    this.onChanged, // Novo
-    this.borderColor, // Novo
+    this.onChanged,
+    this.borderColor, 
   });
 
   @override
@@ -54,17 +54,15 @@ class _CustomFormFieldState extends State<CustomFormField> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            // ignore: deprecated_member_use
+            
             color: AppColors.black87.withOpacity(0.3),
             borderRadius: BorderRadius.circular(12),
-            // AQUI ESTÁ A MÁGICA:
-            // Se passarmos uma cor (verde/vermelho), usa ela.
-            // Se for null, usa a cor padrão (white24).
+            
             border: Border.all(
                 color: widget.borderColor ?? Colors.white24,
                 width: widget.borderColor != null
                     ? 1.5
-                    : 1.0 // Fica um pouquinho mais grosso se tiver cor
+                    : 1.0 
                 ),
           ),
           child: TextFormField(
@@ -75,7 +73,7 @@ class _CustomFormFieldState extends State<CustomFormField> {
             maxLines: widget.isPassword ? 1 : widget.maxLines,
             obscureText: widget.isPassword ? _isObscured : false,
 
-            // Conectamos o onChanged aqui
+           
             onChanged: widget.onChanged,
 
             style: const TextStyle(
@@ -85,9 +83,8 @@ class _CustomFormFieldState extends State<CustomFormField> {
               letterSpacing: 0.5,
             ),
             cursorColor: AppColors.primary,
-
             decoration: InputDecoration(
-              // O ícone também muda de cor se tiver borda colorida
+              
               prefixIcon: Icon(widget.icon,
                   color: widget.borderColor ?? AppColors.white54),
               border: InputBorder.none,

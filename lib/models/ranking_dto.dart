@@ -3,7 +3,6 @@ class RankingDTO {
   final int pontuacao;
   final int vitorias;
   final int kills;
-  // A posição será calculada visualmente na lista
 
   RankingDTO({
     required this.nickname,

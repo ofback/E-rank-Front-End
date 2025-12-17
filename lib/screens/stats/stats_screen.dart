@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/models/player_card.dart';
 import 'package:erank_app/services/estatisticas_service.dart';
-import 'package:erank_app/widgets/player_card_widget.dart'; // Importe o widget criado acima
+import 'package:erank_app/widgets/player_card_widget.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -51,10 +51,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   else
                     const Text("Não foi possível carregar a carta.",
                         style: TextStyle(color: Colors.white)),
-
                   const SizedBox(height: 30),
-
-                  // Seção de título "Estatísticas da Partida" (como na imagem)
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -66,9 +63,6 @@ class _StatsScreenState extends State<StatsScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  // Aqui poderia entrar uma lista das ultimas partidas
-                  // Como o foco é a carta, deixaremos um placeholder visual
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(

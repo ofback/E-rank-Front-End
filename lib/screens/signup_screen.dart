@@ -504,7 +504,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
 
-                // 8. CONFIRMA SENHA
+               
                 CustomFormField(
                   controller: _confirmPasswordController,
                   label: 'CONFIRME A SENHA',
