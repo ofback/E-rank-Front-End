@@ -113,32 +113,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void _validateCPF(String val) {
     setState(() {
-      if (val.isEmpty)
+      if (val.isEmpty) {
         _cpfColor = null;
-      else if (val.length == 14)
+      } else if (val.length == 14) {
         _cpfColor = Colors.greenAccent;
-      else
+      } else {
         _cpfColor = Colors.redAccent;
+      }
     });
   }
 
   void _validateEmail(String val) {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     setState(() {
-      if (val.isEmpty)
+      if (val.isEmpty) {
         _emailColor = null;
-      else if (emailRegex.hasMatch(val))
+      } else if (emailRegex.hasMatch(val)) {
         _emailColor = Colors.greenAccent;
-      else
+      } else {
         _emailColor = Colors.redAccent;
+      }
     });
   }
 
   void _validateConfirmEmail(String val) {
     setState(() {
-      if (val.isEmpty)
+      if (val.isEmpty) {
         _confirmEmailColor = null;
-      else if (val == _emailController.text &&
+      } else if (val == _emailController.text &&
           _emailColor == Colors.greenAccent) {
         _confirmEmailColor = Colors.greenAccent;
       } else {
@@ -163,12 +165,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void _validateConfirmPass(String val) {
     setState(() {
-      if (val.isEmpty)
+      if (val.isEmpty) {
         _confirmPassColor = null;
-      else if (val == _passwordController.text)
+      } else if (val == _passwordController.text) {
         _confirmPassColor = Colors.greenAccent;
-      else
+      } else {
         _confirmPassColor = Colors.redAccent;
+      }
     });
   }
 
@@ -367,12 +370,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       constraints: const BoxConstraints(maxWidth: 750),
       child: Container(
         decoration: BoxDecoration(
-            color: const Color(0xFF1E1E2C).withOpacity(0.95),
+            color: const Color(0xFF1E1E2C).withValues(alpha: 0.95),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.white24),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   blurRadius: 10,
                   offset: const Offset(0, 5)),
             ]),
@@ -406,13 +409,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   borderColor: _nomeColor,
                   onChanged: _validateNome,
                   validator: (val) {
-                    if (val == null || val.isEmpty) return 'Nome é obrigatório';
-                    if (val.trim().split(' ').length < 2)
+                    if (val == null || val.isEmpty) {
+                      return 'Nome é obrigatório';
+                    }
+                    if (val.trim().split(' ').length < 2) {
                       return 'Digite nome e sobrenome';
+                    }
                     return null;
                   },
                 ),
-
                 CustomFormField(
                   controller: _nicknameController,
                   label: 'NICKNAME',
@@ -425,7 +430,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   },
                 ),
-
                 CustomFormField(
                   controller: _dataNascimentoController,
                   label: 'NASCIMENTO',
@@ -441,15 +445,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       final parts = val.split('/');
                       final d = int.parse(parts[0]);
                       final m = int.parse(parts[1]);
-                      if (d > 31 || m > 12 || d < 1 || m < 1)
+                      if (d > 31 || m > 12 || d < 1 || m < 1) {
                         return 'Data inválida';
+                      }
                     } catch (e) {
                       return 'Data inválida';
                     }
                     return null;
                   },
                 ),
-
                 CustomFormField(
                   controller: _cpfController,
                   label: 'CPF',
@@ -461,7 +465,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   validator: (val) =>
                       (val == null || val.length != 14) ? 'CPF Inválido' : null,
                 ),
-
                 CustomFormField(
                   controller: _emailController,
                   label: 'E-MAIL',
@@ -474,7 +477,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     EmailValidator(errorText: 'Inválido')
                   ]).call,
                 ),
-
                 CustomFormField(
                   controller: _confirmEmailController,
                   label: 'CONFIRME O E-MAIL',
@@ -486,7 +488,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       MatchValidator(errorText: 'E-mails não coincidem')
                           .validateMatch(val!, _emailController.text),
                 ),
-
                 CustomFormField(
                   controller: _passwordController,
                   label: 'SENHA',
@@ -498,13 +499,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (val == null || val.isEmpty) return 'Obrigatória';
                     final passwordRegex =
                         RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$');
-                    if (!passwordRegex.hasMatch(val))
+                    if (!passwordRegex.hasMatch(val)) {
                       return 'Mín 8 chars, 1 num, 1 maiús, 1 minús';
+                    }
                     return null;
                   },
                 ),
-
-               
                 CustomFormField(
                   controller: _confirmPasswordController,
                   label: 'CONFIRME A SENHA',
