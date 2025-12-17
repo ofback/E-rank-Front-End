@@ -71,21 +71,16 @@ class ApiClient {
     return await http.delete(url, headers: headers);
   }
 
-  /// Trata a resposta HTTP:
-  /// - Sucesso (200-299): Retorna o JSON decodificado (dynamic) ou Map vazio.
-  /// - Erro (>= 300): Lança ApiException com a mensagem vinda do backend.
   static dynamic handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      // Se não tiver corpo (204 No Content), retorna map vazio
       if (response.body.isEmpty) return {};
-      // Decodifica UTF-8 para suportar acentuação corretamente
+
       return jsonDecode(utf8.decode(response.bodyBytes));
     } else {
-      // Tenta extrair mensagem de erro do backend (GlobalExceptionHandler)
       String errorMsg = 'Erro desconhecido';
       try {
         final body = jsonDecode(utf8.decode(response.bodyBytes));
-        // Procura campos comuns de erro: 'message' ou 'error'
+
         errorMsg = body['message'] ?? body['error'] ?? 'Erro na requisição';
       } catch (_) {
         errorMsg = 'Erro HTTP ${response.statusCode}';

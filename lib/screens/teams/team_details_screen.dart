@@ -190,12 +190,11 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
             onPressed: () async {
               final id = int.tryParse(controller.text);
               if (id != null) {
-                Navigator.pop(ctx); // Fecha o Dialog (sync, ok)
+                Navigator.pop(ctx);
 
                 try {
                   await TeamService.addMember(widget.team['id'], id);
 
-                  // Verifica se a tela ainda está ativa antes de usar context
                   if (!mounted) return;
 
                   _refresh();
@@ -203,7 +202,6 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
                       content: Text("Convite enviado!"),
                       backgroundColor: Colors.green));
                 } catch (e) {
-                  // _showError já tem check de mounted
                   _showError(e.toString());
                 }
               }

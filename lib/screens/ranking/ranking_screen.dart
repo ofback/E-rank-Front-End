@@ -14,21 +14,19 @@ class _RankingScreenState extends State<RankingScreen>
   final RankingService _service = RankingService();
   late TabController _tabController;
 
-  // Estado da Lista
   List<RankingDTO> _players = [];
   bool _isLoading = false;
   int _currentPage = 0;
   bool _hasMore = true;
-  String _currentTipo = 'GLOBAL'; // 'GLOBAL' ou 'AMIGOS'
+  String _currentTipo = 'GLOBAL';
 
   @override
   void initState() {
     super.initState();
-    // Configura as abas
+
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
 
-    // Carrega inicial
     _loadRanking();
   }
 
@@ -39,9 +37,8 @@ class _RankingScreenState extends State<RankingScreen>
   }
 
   void _handleTabSelection() {
-    if (_tabController.indexIsChanging) return; // Evita duplo disparo
+    if (_tabController.indexIsChanging) return;
 
-    // Define o tipo baseado na aba selecionada
     final novoTipo = _tabController.index == 0 ? 'GLOBAL' : 'AMIGOS';
 
     if (_currentTipo != novoTipo) {
@@ -66,7 +63,6 @@ class _RankingScreenState extends State<RankingScreen>
     setState(() => _isLoading = true);
 
     try {
-      // Passa o _currentTipo para o service
       final newPlayers =
           await _service.getRanking(page: _currentPage, tipo: _currentTipo);
 
@@ -103,7 +99,6 @@ class _RankingScreenState extends State<RankingScreen>
       ),
       body: NotificationListener<ScrollNotification>(
         onNotification: (ScrollNotification scrollInfo) {
-          // Infinite Scroll simples
           if (!_isLoading &&
               _hasMore &&
               scrollInfo.metrics.pixels >=
@@ -135,7 +130,7 @@ class _RankingScreenState extends State<RankingScreen>
                         }
 
                         final player = _players[index];
-                        final posicao = index + 1; // Calculado visualmente
+                        final posicao = index + 1;
 
                         return ListTile(
                           leading: CircleAvatar(
