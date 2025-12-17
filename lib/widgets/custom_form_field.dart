@@ -12,6 +12,10 @@ class CustomFormField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLines;
 
+  
+  final Function(String)? onChanged; 
+  final Color? borderColor; 
+
   const CustomFormField({
     super.key,
     required this.label,
@@ -22,6 +26,8 @@ class CustomFormField extends StatefulWidget {
     this.keyboardType,
     this.inputFormatters,
     this.maxLines = 1,
+    this.onChanged,
+    this.borderColor, 
   });
 
   @override
@@ -48,10 +54,16 @@ class _CustomFormFieldState extends State<CustomFormField> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            // ignore: deprecated_member_use
+            
             color: AppColors.black87.withOpacity(0.3),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white24),
+            
+            border: Border.all(
+                color: widget.borderColor ?? Colors.white24,
+                width: widget.borderColor != null
+                    ? 1.5
+                    : 1.0 
+                ),
           ),
           child: TextFormField(
             controller: widget.controller,
@@ -60,6 +72,10 @@ class _CustomFormFieldState extends State<CustomFormField> {
             inputFormatters: widget.inputFormatters,
             maxLines: widget.isPassword ? 1 : widget.maxLines,
             obscureText: widget.isPassword ? _isObscured : false,
+
+           
+            onChanged: widget.onChanged,
+
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w600,
@@ -68,10 +84,13 @@ class _CustomFormFieldState extends State<CustomFormField> {
             ),
             cursorColor: AppColors.primary,
             decoration: InputDecoration(
-              prefixIcon: Icon(widget.icon, color: AppColors.white54),
+              
+              prefixIcon: Icon(widget.icon,
+                  color: widget.borderColor ?? AppColors.white54),
               border: InputBorder.none,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+
               suffixIcon: widget.isPassword
                   ? IconButton(
                       icon: Icon(
