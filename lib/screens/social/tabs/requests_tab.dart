@@ -1,6 +1,7 @@
 import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/services/social_service.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class RequestsTab extends StatefulWidget {
   const RequestsTab({super.key});
@@ -25,9 +26,7 @@ class _RequestsTabState extends State<RequestsTab> {
   }
 
   Future<void> _handleRequest(int friendshipId, bool accept) async {
-    setState(() {
-      _loadingFriendshipId = friendshipId;
-    });
+    setState(() => _loadingFriendshipId = friendshipId);
 
     final success = accept
         ? await SocialService.acceptFriendRequest(friendshipId)
@@ -39,20 +38,6 @@ class _RequestsTabState extends State<RequestsTab> {
       _loadingFriendshipId = null;
       if (success) {
         _requests?.removeWhere((req) => req['friendshipId'] == friendshipId);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: AppColors.green,
-            content:
-                Text('Convite ${accept ? "aceito" : "recusado"} com sucesso!'),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: AppColors.red,
-            content: Text('Ocorreu um erro. Tente novamente.'),
-          ),
-        );
       }
     });
   }
@@ -65,20 +50,14 @@ class _RequestsTabState extends State<RequestsTab> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (snapshot.hasError) {
-          return const Center(
-              child: Text('Erro ao carregar convites.',
-                  style: TextStyle(color: AppColors.white)));
-        }
-
         if (_requests == null && snapshot.hasData) {
           _requests = snapshot.data!;
         }
 
         if (_requests == null || _requests!.isEmpty) {
-          return const Center(
+          return Center(
               child: Text('Nenhum convite pendente.',
-                  style: TextStyle(color: AppColors.white54)));
+                  style: GoogleFonts.poppins(color: Colors.white54)));
         }
 
         return ListView.builder(
@@ -89,27 +68,36 @@ class _RequestsTabState extends State<RequestsTab> {
             final isProcessing =
                 _loadingFriendshipId == request['friendshipId'];
 
-            return Card(
-              // ignore: deprecated_member_use
-              color: Colors.white.withOpacity(0.05),
-              margin: const EdgeInsets.symmetric(vertical: 4),
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E2C).withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(12),
+                border:
+                    Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                boxShadow: [
+                  BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      blurRadius: 10)
+                ],
+              ),
               child: ListTile(
                 leading: CircleAvatar(
-                  // ignore: deprecated_member_use
-                  backgroundColor: AppColors.primary.withOpacity(0.8),
+                  backgroundColor: AppColors.primary,
                   child: Text(
                     request['senderNickname']?[0].toUpperCase() ?? '?',
-                    style: const TextStyle(color: AppColors.white),
+                    style: GoogleFonts.bevan(color: Colors.white),
                   ),
                 ),
                 title: Text(
                   request['senderNickname'] ?? 'Usuário',
-                  style: const TextStyle(
-                      color: AppColors.white, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.exo2(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
-                subtitle: const Text(
-                  'Enviou um pedido de amizade',
-                  style: TextStyle(color: AppColors.white54),
+                subtitle: Text(
+                  'Quer ser seu amigo',
+                  style:
+                      GoogleFonts.poppins(color: Colors.white54, fontSize: 12),
                 ),
                 trailing: isProcessing
                     ? const SizedBox(
@@ -122,17 +110,15 @@ class _RequestsTabState extends State<RequestsTab> {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.check_circle,
-                                color: AppColors.green),
+                                color: Colors.greenAccent),
                             onPressed: () =>
                                 _handleRequest(request['friendshipId'], true),
-                            tooltip: 'Aceitar',
                           ),
                           IconButton(
-                            icon:
-                                const Icon(Icons.cancel, color: AppColors.red),
+                            icon: const Icon(Icons.cancel,
+                                color: Colors.redAccent),
                             onPressed: () =>
                                 _handleRequest(request['friendshipId'], false),
-                            tooltip: 'Recusar',
                           ),
                         ],
                       ),
