@@ -51,6 +51,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.all(24.0),
               child: Container(
                 padding: const EdgeInsets.all(32),
+                constraints: const BoxConstraints(
+                    maxWidth: 500), // Limite máximo para tablets/web
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E1E2C).withValues(alpha: 0.90),
                   borderRadius: BorderRadius.circular(24),
@@ -65,83 +67,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: CrossAxisAlignment
+                      .center, // Centraliza ao invés de esticar
                   children: [
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border:
-                                Border.all(color: AppColors.primary, width: 2),
-                            boxShadow: [
-                              BoxShadow(
-                                  color:
-                                      AppColors.primary.withValues(alpha: 0.5),
-                                  blurRadius: 20)
-                            ]),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.black,
-                          child: Text(
-                            user['nickname']?[0].toUpperCase() ?? 'U',
-                            style: GoogleFonts.bevan(
-                                fontSize: 40, color: AppColors.white),
-                          ),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border:
+                              Border.all(color: AppColors.primary, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.5),
+                                blurRadius: 20)
+                          ]),
+                      child: CircleAvatar(
+                        radius: 60, // Aumentei um pouco o avatar
+                        backgroundColor: Colors.black,
+                        child: Text(
+                          user['nickname']?[0].toUpperCase() ?? 'U',
+                          style: GoogleFonts.bevan(
+                              fontSize: 48, color: AppColors.white),
                         ),
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Center(
-                      child: Text(
-                        user['nickname'] ?? 'Usuário',
-                        style: GoogleFonts.exo2(
-                            color: AppColors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold),
-                      ),
+                    Text(
+                      user['nickname'] ?? 'Usuário',
+                      style: GoogleFonts.exo2(
+                          color: AppColors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold),
                     ),
-                    Center(
-                      child: Text(
-                        user['email'] ?? 'email@desconhecido.com',
-                        style: GoogleFonts.poppins(
-                            color: AppColors.white54, fontSize: 14),
-                      ),
+                    Text(
+                      user['email'] ?? 'email@desconhecido.com',
+                      style: GoogleFonts.poppins(
+                          color: AppColors.white54, fontSize: 14),
                     ),
                     const SizedBox(height: 40),
-                    PrimaryButton(
-                      text: 'EDITAR PERFIL',
-                      onPressed: () {
-                        Navigator.of(context)
-                            .push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                EditProfileScreen(userData: user),
-                          ),
-                        )
-                            .then((_) {
-                          setState(() {});
-                        });
-                      },
+
+                    // Botão EDITAR PERFIL com largura controlada
+                    SizedBox(
+                      width: 280, // Largura fixa agradável
+                      child: PrimaryButton(
+                        text: 'EDITAR PERFIL',
+                        onPressed: () {
+                          Navigator.of(context)
+                              .push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EditProfileScreen(userData: user),
+                            ),
+                          )
+                              .then((_) {
+                            setState(() {});
+                          });
+                        },
+                      ),
                     ),
+
                     const SizedBox(height: 16),
-                    PrimaryButton(
-                      text: 'CRIAR TIME',
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (context) => const CreateTeamScreen()),
-                        );
-                      },
+
+                    // Botão CRIAR TIME com largura controlada
+                    SizedBox(
+                      width: 280, // Mesma largura para consistência
+                      child: PrimaryButton(
+                        text: 'CRIAR TIME',
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => const CreateTeamScreen()),
+                          );
+                        },
+                      ),
                     ),
+
                     const SizedBox(height: 30),
-                    const Divider(color: Colors.white12),
+                    const Divider(
+                        color: Colors.white12,
+                        indent: 40,
+                        endIndent: 40), // Divisor mais curto
                     const SizedBox(height: 10),
+
                     TextButton.icon(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                      ),
                       icon: const Icon(Icons.logout, color: Colors.redAccent),
                       label: Text('SAIR DA CONTA',
                           style: GoogleFonts.exo2(
                               color: Colors.redAccent,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold)),
                       onPressed: _logout,
                     ),
