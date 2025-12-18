@@ -3,6 +3,7 @@ import 'package:erank_app/models/challenge.dart';
 import 'package:erank_app/screens/challenges/register_result_screen.dart';
 import 'package:erank_app/services/api_client.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ActiveMatchesScreen extends StatefulWidget {
   const ActiveMatchesScreen({super.key});
@@ -35,90 +36,73 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Partidas Ativas'),
-        backgroundColor: AppColors.background,
-      ),
-      body: FutureBuilder<List<Challenge>>(
-        future: _matchesFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(
-                child: Text('Erro: ${snapshot.error}',
-                    style: const TextStyle(color: Colors.red)));
-          }
-          final list = snapshot.data ?? [];
+      backgroundColor: const Color(0xFF0F0C29),
+      body: Stack(
+        children: [
+          Positioned.fill(
+              child:
+                  Image.asset('assets/background_neon.png', fit: BoxFit.cover)),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              title: Text('PARTIDAS ATIVAS',
+                  style: GoogleFonts.bevan(color: Colors.white)),
+              backgroundColor: Colors.transparent,
+              iconTheme: const IconThemeData(color: Colors.white),
+            ),
+            body: FutureBuilder<List<Challenge>>(
+              future: _matchesFuture,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData)
+                  return const Center(child: CircularProgressIndicator());
+                final list = snapshot.data ?? [];
+                if (list.isEmpty)
+                  return Center(
+                      child: Text('Nenhuma partida ativa.',
+                          style: GoogleFonts.poppins(color: Colors.white54)));
 
-          if (list.isEmpty) {
-            return const Center(
-              child: Text('Nenhuma partida ativa no momento.',
-                  style: TextStyle(color: Colors.white54)),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: list.length,
-            itemBuilder: (context, index) {
-              final challenge = list[index];
-
-              final bool jaRegistrei = challenge.status == 'AGUARDANDO';
-
-              return Card(
-                color: AppColors.surface,
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  title: Text(
-                    challenge.desafianteNome,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    'Data: ${challenge.dataHora}',
-                    style: const TextStyle(color: Colors.white54),
-                  ),
-                  trailing: jaRegistrei
-                      ? Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.orange),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'Aguardando\nOponente',
-                            textAlign: TextAlign.center,
-                            style:
-                                TextStyle(color: Colors.orange, fontSize: 10),
-                          ),
-                        )
-                      : ElevatedButton(
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: list.length,
+                  itemBuilder: (context, index) {
+                    final challenge = list[index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E2C).withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white10),
+                      ),
+                      child: ListTile(
+                        title: Text(challenge.desafianteNome,
+                            style: GoogleFonts.exo2(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
+                        subtitle: Text('Data: ${challenge.dataHora}',
+                            style: GoogleFonts.poppins(
+                                color: Colors.white54, fontSize: 12)),
+                        trailing: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                          ),
+                              backgroundColor: AppColors.primary),
                           onPressed: () async {
                             await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    RegisterResultScreen(challenge: challenge),
-                              ),
-                            );
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => RegisterResultScreen(
+                                        challenge: challenge)));
                             _loadMatches();
                           },
-                          child: const Text('Registrar',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 12)),
+                          child: const Text('REGISTRAR',
+                              style: TextStyle(color: Colors.white)),
                         ),
-                ),
-              );
-            },
-          );
-        },
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
