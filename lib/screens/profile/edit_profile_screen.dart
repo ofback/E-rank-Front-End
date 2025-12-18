@@ -1,12 +1,11 @@
-import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/widgets/custom_form_field.dart';
 import 'package:erank_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/services/user_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
-
   const EditProfileScreen({super.key, required this.userData});
 
   @override
@@ -36,69 +35,68 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _saveProfile() async {
     setState(() => _isLoading = true);
-
-    final profileData = {
+    final success = await UserService.updateMyProfile({
       'nickname': _nicknameController.text,
       'biografia': _biografiaController.text,
-    };
-
-    final success = await UserService.updateMyProfile(profileData);
-
+    });
     if (!mounted) return;
-
     setState(() => _isLoading = false);
-
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppColors.green,
-          content: Text('Perfil atualizado com sucesso!'),
-        ),
-      );
-      Navigator.of(context).pop();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppColors.red,
-          content: Text('Erro ao atualizar o perfil. Tente novamente.'),
-        ),
-      );
-    }
+    if (success) Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Editar Perfil'),
-        backgroundColor: AppColors.background,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            CustomFormField(
-              controller: _nicknameController,
-              label: 'Nickname',
-              icon: Icons.person,
+      backgroundColor: const Color(0xFF0F0C29),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset('assets/background_neon.png', fit: BoxFit.cover),
+          ),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              title: Text('EDITAR PERFIL', style: GoogleFonts.bevan()),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              iconTheme: const IconThemeData(color: Colors.white),
             ),
-            const SizedBox(height: 20),
-            CustomFormField(
-              controller: _biografiaController,
-              label: 'Biografia',
-              icon: Icons.description,
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E1E2C).withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    CustomFormField(
+                      controller: _nicknameController,
+                      label: 'NICKNAME',
+                      icon: Icons.person,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomFormField(
+                      controller: _biografiaController,
+                      label: 'BIOGRAFIA',
+                      icon: Icons.description,
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 40),
+                    PrimaryButton(
+                      text: 'SALVAR ALTERAÇÕES',
+                      isLoading: _isLoading,
+                      onPressed: _saveProfile,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 40),
-            PrimaryButton(
-              text: 'SALVAR ALTERAÇÕES',
-              isLoading: _isLoading,
-              onPressed: _saveProfile,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
