@@ -51,8 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.all(24.0),
               child: Container(
                 padding: const EdgeInsets.all(32),
-                constraints: const BoxConstraints(
-                    maxWidth: 500), // Limite máximo para tablets/web
+                constraints: const BoxConstraints(maxWidth: 500),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E1E2C).withValues(alpha: 0.90),
                   borderRadius: BorderRadius.circular(24),
@@ -105,10 +104,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: AppColors.white54, fontSize: 14),
                     ),
                     const SizedBox(height: 40),
-
-                    // Botão EDITAR PERFIL com largura controlada
                     SizedBox(
-                      width: 280, // Largura fixa agradável
+                      width: 280,
                       child: PrimaryButton(
                         text: 'EDITAR PERFIL',
                         onPressed: () {
@@ -125,12 +122,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
-                    // Botão CRIAR TIME com largura controlada
                     SizedBox(
-                      width: 280, // Mesma largura para consistência
+                      width: 280,
                       child: PrimaryButton(
                         text: 'CRIAR TIME',
                         onPressed: () {
@@ -141,14 +135,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                     ),
-
                     const SizedBox(height: 30),
                     const Divider(
-                        color: Colors.white12,
-                        indent: 40,
-                        endIndent: 40), // Divisor mais curto
+                        color: Colors.white12, indent: 40, endIndent: 40),
                     const SizedBox(height: 10),
-
                     TextButton.icon(
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
