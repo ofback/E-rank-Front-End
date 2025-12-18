@@ -3,6 +3,7 @@ import 'package:erank_app/models/team_member.dart';
 import 'package:erank_app/services/auth_storage.dart';
 import 'package:erank_app/services/team_service.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TeamDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> team;
@@ -54,75 +55,118 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        title: Text(widget.team['nome'] ?? 'Time',
-            style: const TextStyle(color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: _membersFuture == null
-          ? const Center(child: CircularProgressIndicator())
-          : FutureBuilder<List<TeamMember>>(
-              future: _membersFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                      child: Text("Sem membros.",
-                          style: TextStyle(color: Colors.white)));
-                }
-
-                final members = snapshot.data!;
-                final myProfile = members.firstWhere(
-                    (m) => m.userId == _currentUserId,
-                    orElse: () => TeamMember(
-                        userId: -1,
-                        nickname: '',
-                        cargo: '',
-                        dataEntrada: '',
-                        status: ''));
-
-                return ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: members.length,
-                  separatorBuilder: (_, __) =>
-                      const Divider(color: Colors.white12),
-                  itemBuilder: (context, index) {
-                    final member = members[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: AppColors.primary,
-                        child: Text(member.nickname.isNotEmpty
-                            ? member.nickname[0].toUpperCase()
-                            : '?'),
-                      ),
-                      title: Text(member.nickname,
-                          style: TextStyle(
-                              color: member.isPendente
-                                  ? Colors.white54
-                                  : Colors.white,
-                              fontWeight: FontWeight.bold)),
-                      subtitle: Text(
-                          member.isPendente ? "Convite Pendente" : member.cargo,
-                          style: TextStyle(
-                              color: member.isPendente
-                                  ? Colors.orange
-                                  : (member.isDono
-                                      ? Colors.amber
-                                      : Colors.blueAccent))),
-                      trailing: _buildActionButtons(member, myProfile),
-                    );
-                  },
-                );
-              },
+      backgroundColor: const Color(0xFF0F0C29),
+      body: Stack(
+        children: [
+          // Background Global
+          Positioned.fill(
+            child: Image.asset(
+              'assets/background_neon.png',
+              fit: BoxFit.cover,
+              errorBuilder: (ctx, err, stack) =>
+                  Container(color: const Color(0xFF0F0C29)),
             ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.person_add, color: Colors.white),
-        onPressed: () => _showAddMemberDialog(),
+          ),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              iconTheme: const IconThemeData(color: Colors.white),
+              centerTitle: true,
+              title: Text(
+                widget.team['nome']?.toUpperCase() ?? 'TIME',
+                style: GoogleFonts.bevan(color: Colors.white, letterSpacing: 1),
+              ),
+            ),
+            body: _membersFuture == null
+                ? const Center(child: CircularProgressIndicator())
+                : FutureBuilder<List<TeamMember>>(
+                    future: _membersFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(
+                            child: Text("Sem membros.",
+                                style: GoogleFonts.poppins(
+                                    color: Colors.white54)));
+                      }
+
+                      final members = snapshot.data!;
+                      final myProfile = members.firstWhere(
+                          (m) => m.userId == _currentUserId,
+                          orElse: () => TeamMember(
+                              userId: -1,
+                              nickname: '',
+                              cargo: '',
+                              dataEntrada: '',
+                              status: ''));
+
+                      return ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: members.length,
+                        itemBuilder: (context, index) {
+                          final member = members[index];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E1E2C)
+                                  .withValues(alpha: 0.8),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.white10),
+                            ),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: member.isDono
+                                    ? Colors.amber
+                                    : (member.isVice
+                                        ? Colors.cyan
+                                        : AppColors.primary),
+                                child: Text(
+                                  member.nickname.isNotEmpty
+                                      ? member.nickname[0].toUpperCase()
+                                      : '?',
+                                  style: GoogleFonts.bevan(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              title: Text(
+                                member.nickname,
+                                style: GoogleFonts.exo2(
+                                  color: member.isPendente
+                                      ? Colors.white54
+                                      : Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                member.isPendente
+                                    ? "Convite Pendente"
+                                    : member.cargo.toUpperCase(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: member.isPendente
+                                      ? Colors.orange
+                                      : Colors.white54,
+                                ),
+                              ),
+                              trailing: _buildActionButtons(member, myProfile),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: AppColors.primary,
+              child: const Icon(Icons.person_add, color: Colors.white),
+              onPressed: () => _showAddMemberDialog(),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -133,18 +177,27 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
 
     return PopupMenuButton<String>(
       icon: const Icon(Icons.more_vert, color: Colors.white),
+      color: const Color(0xFF1E1E2C), // Cor de fundo do menu
       onSelected: (value) {
         if (value == 'promote') _promote(target);
         if (value == 'kick') _kick(target);
       },
       itemBuilder: (context) => [
         if (me.isDono && target.isMembro && !target.isPendente)
-          const PopupMenuItem(value: 'promote', child: Text('Promover a Vice')),
+          PopupMenuItem(
+              value: 'promote',
+              child: Text('Promover a Vice',
+                  style: GoogleFonts.poppins(color: Colors.white))),
         if (me.isDono && target.isVice)
-          const PopupMenuItem(
-              value: 'promote', child: Text('Rebaixar a Membro')),
+          PopupMenuItem(
+              value: 'promote',
+              child: Text('Rebaixar a Membro',
+                  style: GoogleFonts.poppins(color: Colors.white))),
         if (me.isDono || (me.isVice && target.isMembro))
-          const PopupMenuItem(value: 'kick', child: Text('Remover')),
+          PopupMenuItem(
+              value: 'kick',
+              child: Text('Remover',
+                  style: GoogleFonts.poppins(color: Colors.redAccent))),
       ],
     );
   }
@@ -173,30 +226,38 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: const Text('Adicionar Membro (ID)',
-            style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF1E1E2C),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Adicionar Membro (ID)',
+            style: GoogleFonts.exo2(color: Colors.white)),
         content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-                hintText: 'ID', hintStyle: TextStyle(color: Colors.white54))),
+          controller: controller,
+          keyboardType: TextInputType.number,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'ID do Usuário',
+            hintStyle: const TextStyle(color: Colors.white38),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Colors.white24)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: AppColors.primary)),
+          ),
+        ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar')),
+              child: const Text('Cancelar',
+                  style: TextStyle(color: Colors.white54))),
           TextButton(
             onPressed: () async {
               final id = int.tryParse(controller.text);
               if (id != null) {
                 Navigator.pop(ctx);
-
                 try {
                   await TeamService.addMember(widget.team['id'], id);
-
                   if (!mounted) return;
-
                   _refresh();
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("Convite enviado!"),
@@ -206,7 +267,9 @@ class _TeamDetailsScreenState extends State<TeamDetailsScreen> {
                 }
               }
             },
-            child: const Text('Adicionar'),
+            child: const Text('ADICIONAR',
+                style: TextStyle(
+                    color: AppColors.primary, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
