@@ -1,8 +1,8 @@
-import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/screens/social/tabs/friends_tab.dart';
 import 'package:erank_app/screens/social/tabs/requests_tab.dart';
 import 'package:erank_app/screens/social/tabs/search_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SocialScreen extends StatefulWidget {
   const SocialScreen({super.key});
@@ -30,29 +30,46 @@ class _SocialScreenState extends State<SocialScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
-        title: const Text('Social', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'SOCIAL',
+          style: GoogleFonts.bevan(
+            fontSize: 28,
+            color: Colors.white,
+            letterSpacing: 1.5,
+          ),
+        ),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.primary,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: Colors.grey,
+          indicatorColor: Colors.blueAccent,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white38,
+          labelStyle: GoogleFonts.exo2(fontWeight: FontWeight.bold),
           tabs: const [
-            Tab(text: 'Amigos'),
-            Tab(text: 'Buscar'),
-            Tab(text: 'Solicitações'),
+            Tab(text: 'AMIGOS'),
+            Tab(text: 'BUSCAR'),
+            Tab(text: 'SOLICITAÇÕES'),
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          FriendsTab(),
-          SearchTab(),
-          RequestsTab(),
-        ],
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/background_neon.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: TabBarView(
+          controller: _tabController,
+          children: const [
+            FriendsTab(),
+            SearchTab(),
+            RequestsTab(),
+          ],
+        ),
       ),
     );
   }
