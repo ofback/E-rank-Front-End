@@ -23,11 +23,12 @@ class _StatsScreenState extends State<StatsScreen> {
 
   Future<void> _loadData() async {
     final card = await EstatisticasService.getMyPlayerCard();
-    if (mounted)
+    if (mounted) {
       setState(() {
         _card = card;
         _isLoading = false;
       });
+    }
   }
 
   @override
@@ -54,9 +55,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     child: Column(
                       children: [
                         if (_card != null)
-                          PlayerCardWidget(
-                              card:
-                                  _card!) // Assumindo que este widget é responsivo/neutro
+                          PlayerCardWidget(card: _card!)
                         else
                           const Text("Erro ao carregar card.",
                               style: TextStyle(color: Colors.white)),
