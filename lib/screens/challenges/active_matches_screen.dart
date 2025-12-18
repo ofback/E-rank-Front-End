@@ -53,13 +53,15 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
             body: FutureBuilder<List<Challenge>>(
               future: _matchesFuture,
               builder: (context, snapshot) {
-                if (!snapshot.hasData)
+                if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
+                }
                 final list = snapshot.data ?? [];
-                if (list.isEmpty)
+                if (list.isEmpty) {
                   return Center(
                       child: Text('Nenhuma partida ativa.',
                           style: GoogleFonts.poppins(color: Colors.white54)));
+                }
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),

@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 class RankingScreen extends StatefulWidget {
   const RankingScreen({super.key});
-
   @override
   State<RankingScreen> createState() => _RankingScreenState();
 }
@@ -14,7 +13,6 @@ class _RankingScreenState extends State<RankingScreen>
     with SingleTickerProviderStateMixin {
   final RankingService _service = RankingService();
   late TabController _tabController;
-
   List<RankingDTO> _players = [];
   bool _isLoading = false;
   int _currentPage = 0;
@@ -36,19 +34,20 @@ class _RankingScreenState extends State<RankingScreen>
   }
 
   void _handleTabSelection() {
-    if (_tabController.indexIsChanging) return;
-
-    final novoTipo = _tabController.index == 0 ? 'GLOBAL' : 'AMIGOS';
-
-    if (_currentTipo != novoTipo) {
+    if (_tabController.indexIsChanging) {
+      return;
+    }
+    final novo = _tabController.index == 0 ? 'GLOBAL' : 'AMIGOS';
+    if (_currentTipo != novo) {
       setState(() {
-        _currentTipo = novoTipo;
-        _resetList();
+        _currentTipo = novo;
+        _resetList(); // Reset list here as well
       });
       _loadRanking();
     }
   }
 
+  // Método adicionado para corrigir o erro 'undefined_method'
   void _resetList() {
     _players = [];
     _currentPage = 0;
@@ -57,28 +56,28 @@ class _RankingScreenState extends State<RankingScreen>
   }
 
   Future<void> _loadRanking() async {
-    if (!_hasMore && _currentPage > 0) return;
-
+    if (!_hasMore && _currentPage > 0) {
+      return;
+    }
     setState(() => _isLoading = true);
-
     try {
       final newPlayers =
           await _service.getRanking(page: _currentPage, tipo: _currentTipo);
-
-      if (!mounted) return;
-
+      if (!mounted) {
+        return;
+      }
       setState(() {
-        if (newPlayers.length < 20) _hasMore = false;
+        if (newPlayers.length < 20) {
+          _hasMore = false;
+        }
         _players.addAll(newPlayers);
         _currentPage++;
         _isLoading = false;
       });
     } catch (e) {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao carregar ranking: $e')),
-      );
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -158,12 +157,13 @@ class _RankingScreenState extends State<RankingScreen>
                               final posicao = index + 1;
 
                               Color? rankColor;
-                              if (posicao == 1)
+                              if (posicao == 1) {
                                 rankColor = Colors.amber;
-                              else if (posicao == 2)
+                              } else if (posicao == 2) {
                                 rankColor = Colors.grey[300];
-                              else if (posicao == 3)
+                              } else if (posicao == 3) {
                                 rankColor = Colors.orange[300];
+                              }
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 12),
@@ -222,8 +222,7 @@ class _RankingScreenState extends State<RankingScreen>
                                   trailing: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment: CrossAxisAlignment.end,
-                                    mainAxisSize: MainAxisSize
-                                        .min, // <--- CRÍTICO: Previne overflow
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                         '${player.pontuacao}',

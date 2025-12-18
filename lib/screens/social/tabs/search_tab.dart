@@ -26,11 +26,15 @@ class _SearchTabState extends State<SearchTab> {
 
   Future<void> _loadCurrentUser() async {
     final userId = await AuthStorage.getUserId();
-    if (mounted) setState(() => _currentUserId = userId);
+    if (mounted) {
+      setState(() => _currentUserId = userId);
+    }
   }
 
   void _searchUsers(String query) async {
-    if (query.isEmpty) return;
+    if (query.isEmpty) {
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -50,7 +54,9 @@ class _SearchTabState extends State<SearchTab> {
 
   void _sendFriendRequest(int targetUserId) async {
     final success = await SocialService.sendFriendRequest(targetUserId);
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(success ? 'Solicitação enviada!' : 'Erro ao enviar.'),
       backgroundColor: success ? Colors.green : Colors.red,
@@ -105,8 +111,9 @@ class _SearchTabState extends State<SearchTab> {
                       itemCount: _searchResults.length,
                       itemBuilder: (context, index) {
                         final user = _searchResults[index];
-                        if (user['id'] == _currentUserId)
+                        if (user['id'] == _currentUserId) {
                           return const SizedBox.shrink();
+                        }
 
                         return Container(
                           margin: const EdgeInsets.only(bottom: 10),

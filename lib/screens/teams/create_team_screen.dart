@@ -30,7 +30,9 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
   }
 
   Future<void> _createTeam() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
     setState(() => _isLoading = true);
     try {
       await TeamService.createTeam(
@@ -38,14 +40,19 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
         description: _descriptionController.text,
         memberIds: _selectedFriendIds.toList(),
       );
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       Navigator.of(context).pop();
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Erro: $e')));
+      }
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -116,15 +123,17 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
                         child: FutureBuilder<List<dynamic>>(
                           future: _friendsFuture,
                           builder: (context, snapshot) {
-                            if (!snapshot.hasData)
+                            if (!snapshot.hasData) {
                               return const Center(
                                   child: CircularProgressIndicator());
+                            }
                             final friends = snapshot.data!;
-                            if (friends.isEmpty)
+                            if (friends.isEmpty) {
                               return Center(
                                   child: Text("Sem amigos",
                                       style: GoogleFonts.poppins(
                                           color: Colors.white54)));
+                            }
 
                             return ListView.separated(
                               itemCount: friends.length,
@@ -143,9 +152,11 @@ class _CreateTeamScreenState extends State<CreateTeamScreen> {
                                   value: isSelected,
                                   onChanged: (val) {
                                     setState(() {
-                                      val == true
-                                          ? _selectedFriendIds.add(friendId)
-                                          : _selectedFriendIds.remove(friendId);
+                                      if (val == true) {
+                                        _selectedFriendIds.add(friendId);
+                                      } else {
+                                        _selectedFriendIds.remove(friendId);
+                                      }
                                     });
                                   },
                                   activeColor: AppColors.primary,
