@@ -2,6 +2,7 @@ import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/screens/challenges/create_challenge_screen.dart';
 import 'package:erank_app/services/social_service.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class FriendsTab extends StatefulWidget {
   const FriendsTab({super.key});
@@ -35,79 +36,83 @@ class _FriendsTabState extends State<FriendsTab> {
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
               'Você ainda não tem amigos adicionados.',
-              style: TextStyle(color: AppColors.white54),
+              style: GoogleFonts.poppins(color: Colors.white54),
             ),
           );
         }
 
         final friends = snapshot.data!;
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(8),
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
           itemCount: friends.length,
-          separatorBuilder: (context, index) =>
-              const Divider(color: Colors.white10),
           itemBuilder: (context, index) {
             final friend = friends[index];
-
             final int friendUserId = friend['userId'] ?? 0;
-
             final int friendshipId =
                 friend['friendshipId'] ?? friend['id'] ?? 0;
 
-            return ListTile(
-              leading: CircleAvatar(
-                backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                child: Text(
-                  (friend['nickname'] ?? '?')[0].toUpperCase(),
-                  style: const TextStyle(color: AppColors.primary),
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E2C).withValues(alpha: 0.8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white10),
+              ),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                  child: Text(
+                    (friend['nickname'] ?? '?')[0].toUpperCase(),
+                    style: GoogleFonts.bevan(color: AppColors.primary),
+                  ),
                 ),
-              ),
-              title: Text(
-                friend['nickname'] ?? 'Sem Nickname',
-                style: const TextStyle(color: AppColors.white),
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    tooltip: 'Desafiar',
-                    icon: const Icon(Icons.flash_on, color: Colors.amber),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CreateChallengeScreen(
-                            initialFriendId: friendUserId,
+                title: Text(
+                  friend['nickname'] ?? 'Sem Nickname',
+                  style: GoogleFonts.exo2(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      tooltip: 'Desafiar',
+                      icon: const Icon(Icons.flash_on, color: Colors.amber),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CreateChallengeScreen(
+                              initialFriendId: friendUserId,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: AppColors.white54),
-                    onSelected: (value) async {
-                      if (value == 'remove') {
-                        final success =
-                            await SocialService.declineOrRemoveFriendship(
-                                friendshipId);
-                        if (success) {
-                          _loadFriends();
+                        );
+                      },
+                    ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Colors.white54),
+                      color: const Color(0xFF1E1E2C),
+                      onSelected: (value) async {
+                        if (value == 'remove') {
+                          final success =
+                              await SocialService.declineOrRemoveFriendship(
+                                  friendshipId);
+                          if (success) _loadFriends();
                         }
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'remove',
-                        child: Text('Desfazer Amizade',
-                            style: TextStyle(color: Colors.red)),
-                      ),
-                    ],
-                  ),
-                ],
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'remove',
+                          child: Text('Desfazer Amizade',
+                              style: GoogleFonts.exo2(color: Colors.redAccent)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             );
           },
