@@ -40,8 +40,13 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-              child:
-                  Image.asset('assets/background_neon.png', fit: BoxFit.cover)),
+            child: Image.asset(
+              'assets/background_neon.png',
+              fit: BoxFit.cover,
+              errorBuilder: (ctx, err, stack) =>
+                  Container(color: const Color(0xFF0F0C29)),
+            ),
+          ),
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
@@ -53,14 +58,21 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
             body: FutureBuilder<List<Challenge>>(
               future: _matchesFuture,
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
+                if (snapshot.hasError) {
+                  return Center(
+                      child: Text('Erro: ${snapshot.error}',
+                          style: const TextStyle(color: Colors.red)));
+                }
                 final list = snapshot.data ?? [];
+
                 if (list.isEmpty) {
                   return Center(
-                      child: Text('Nenhuma partida ativa.',
-                          style: GoogleFonts.poppins(color: Colors.white54)));
+                    child: Text('Nenhuma partida ativa.',
+                        style: GoogleFonts.poppins(color: Colors.white54)),
+                  );
                 }
 
                 return ListView.builder(
@@ -68,6 +80,9 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
                   itemCount: list.length,
                   itemBuilder: (context, index) {
                     final challenge = list[index];
+                    // LÓGICA RESTAURADA: Verifica se o status é 'AGUARDANDO'
+                    final bool jaRegistrei = challenge.status == 'AGUARDANDO';
+
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
@@ -76,27 +91,47 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
                         border: Border.all(color: Colors.white10),
                       ),
                       child: ListTile(
-                        title: Text(challenge.desafianteNome,
-                            style: GoogleFonts.exo2(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)),
-                        subtitle: Text('Data: ${challenge.dataHora}',
-                            style: GoogleFonts.poppins(
-                                color: Colors.white54, fontSize: 12)),
-                        trailing: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary),
-                          onPressed: () async {
-                            await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => RegisterResultScreen(
-                                        challenge: challenge)));
-                            _loadMatches();
-                          },
-                          child: const Text('REGISTRAR',
-                              style: TextStyle(color: Colors.white)),
+                        title: Text(
+                          challenge.desafianteNome,
+                          style: GoogleFonts.exo2(
+                              color: Colors.white, fontWeight: FontWeight.bold),
                         ),
+                        subtitle: Text(
+                          'Data: ${challenge.dataHora}',
+                          style: GoogleFonts.poppins(
+                              color: Colors.white54, fontSize: 12),
+                        ),
+                        trailing: jaRegistrei
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.orange),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'Aguardando\nOponente',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                      color: Colors.orange, fontSize: 10),
+                                ),
+                              )
+                            : ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary),
+                                onPressed: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => RegisterResultScreen(
+                                          challenge: challenge),
+                                    ),
+                                  );
+                                  _loadMatches();
+                                },
+                                child: const Text('REGISTRAR',
+                                    style: TextStyle(color: Colors.white)),
+                              ),
                       ),
                     );
                   },
