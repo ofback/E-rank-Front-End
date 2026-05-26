@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:erank_app/core/theme/app_colors.dart';
+import 'package:erank_app/core/theme/app_theme.dart';
 import 'package:erank_app/navigation/auth_wrapper.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
   runApp(const MyApp());
 }
 
@@ -14,13 +13,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'E-rank',
+      title: 'E-Rank',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.purple,
-        primaryColor: AppColors.primary,
-      ),
+      theme: AppTheme.dark,
       home: const AuthWrapper(),
     );
   }
