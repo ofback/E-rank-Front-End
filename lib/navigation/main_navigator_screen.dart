@@ -1,3 +1,4 @@
+import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/screens/home_screen.dart';
 import 'package:erank_app/screens/profile/profile_screen.dart';
 import 'package:erank_app/screens/social/social_screen.dart';
@@ -28,7 +29,7 @@ class _MainNavigatorScreenState extends State<MainNavigatorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0C29),
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           Positioned.fill(
@@ -36,7 +37,7 @@ class _MainNavigatorScreenState extends State<MainNavigatorScreen> {
               'assets/background_neon.png',
               fit: BoxFit.cover,
               errorBuilder: (ctx, err, stack) =>
-                  Container(color: const Color(0xFF141414)),
+                  Container(color: AppColors.background),
             ),
           ),
           SafeArea(
@@ -76,9 +77,9 @@ class _MainNavigatorScreenState extends State<MainNavigatorScreen> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: Colors.blueAccent,
-          unselectedItemColor: Colors.white38,
-          backgroundColor: const Color(0xFF0F0C29).withValues(alpha: 0.95),
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: AppColors.textDisabled,
+          backgroundColor: AppColors.background.withValues(alpha: 0.95),
           elevation: 0,
           onTap: _onItemTapped,
           type: BottomNavigationBarType.fixed,

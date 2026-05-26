@@ -53,7 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.all(32),
                 constraints: const BoxConstraints(maxWidth: 500),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E2C).withValues(alpha: 0.90),
+                  color: AppColors.surface.withValues(alpha: 0.90),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Colors.white24, width: 1),
                   boxShadow: [

@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0C29),
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           Positioned.fill(
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
               'assets/background_neon.png',
               fit: BoxFit.cover,
               errorBuilder: (ctx, err, stack) =>
-                  Container(color: const Color(0xFF141414)),
+                  Container(color: AppColors.background),
             ),
           ),
           SafeArea(
@@ -141,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
                           color:
-                              const Color(0xFF1E1E2C).withValues(alpha: 0.90),
+                              AppColors.surface.withValues(alpha: 0.90),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(color: Colors.white24, width: 1),
                           boxShadow: [
@@ -258,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
       width: 55,
       height: 55,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: AppColors.textPrimary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white24),
       ),

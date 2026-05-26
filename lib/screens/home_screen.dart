@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+      SnackBar(content: Text(message), backgroundColor: AppColors.danger),
     );
   }
 
@@ -50,41 +50,42 @@ class _HomeScreenState extends State<HomeScreen> {
           'E-RANK',
           style: GoogleFonts.bevan(
             fontSize: 28,
-            color: Colors.white,
+            color: AppColors.textPrimary,
             letterSpacing: 1.5,
           ),
         ),
         centerTitle: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
         actions: [
-          _buildActionButton(Icons.emoji_events, Colors.amber, 'Ranking', () {
+          _buildActionButton(Icons.emoji_events, AppColors.gold, 'Ranking', () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const RankingScreen()));
           }),
           _buildActionButton(
-              Icons.sports_kabaddi, Colors.blueAccent, 'Desafios', () {
+              Icons.sports_kabaddi, AppColors.info, 'Desafios', () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (_) => const ChallengesListScreen()));
           }),
           _buildActionButton(
-              Icons.sports_esports, Colors.greenAccent, 'Partidas', () {
+              Icons.sports_esports, AppColors.accent, 'Partidas', () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const ActiveMatchesScreen()));
           }),
-          _buildActionButton(Icons.bar_chart, Colors.purpleAccent, 'Stats', () {
+          _buildActionButton(
+              Icons.bar_chart, AppColors.primary, 'Stats', () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const StatsScreen()));
           }),
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white54),
+            icon: Icon(Icons.logout,
+                color: AppColors.textPrimary.withValues(alpha: 0.54)),
             tooltip: 'Sair',
             onPressed: () async {
               await AuthStorage.logout();
-              // Lógica de redirecionamento ou refresh pode ser adicionada aqui
             },
           ),
         ],
@@ -99,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: GoogleFonts.exo2(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white70,
+                  color: AppColors.textPrimary.withValues(alpha: 0.7),
                   letterSpacing: 1),
             ),
           ),
@@ -116,10 +117,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Icon(Icons.group_off_outlined,
                             size: 60,
-                            color: Colors.white.withValues(alpha: 0.3)),
+                            color:
+                                AppColors.textPrimary.withValues(alpha: 0.3)),
                         const SizedBox(height: 10),
                         Text('Você ainda não faz parte de um time.',
-                            style: GoogleFonts.poppins(color: Colors.white54)),
+                            style: GoogleFonts.poppins(
+                                color: AppColors.textSecondary)),
                       ],
                     ),
                   );
@@ -150,10 +153,10 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         backgroundColor: AppColors.primary,
         elevation: 10,
-        icon: const Icon(Icons.flash_on, color: Colors.white),
+        icon: const Icon(Icons.flash_on, color: AppColors.textPrimary),
         label: Text('DESAFIAR',
             style: GoogleFonts.exo2(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -172,13 +175,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final String teamName = team['nome'] ?? 'Sem Nome';
     final String teamCargo = team['cargo'] ?? 'Membro';
     final String teamStatus = team['status'] ?? 'P';
+    final bool isActive = teamStatus == 'A';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E2C).withValues(alpha: 0.8),
+        color: AppColors.surface.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: AppColors.borderSubtle),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.4),
@@ -192,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            if (teamStatus == 'A') {
+            if (isActive) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -214,11 +218,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.blueAccent.withValues(alpha: 0.1),
+                        color: AppColors.info.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.shield,
-                          color: Colors.blueAccent, size: 24),
+                      child: Icon(
+                        Icons.shield,
+                        color: isActive ? AppColors.info : AppColors.pending,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -228,35 +235,33 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             teamName,
                             style: GoogleFonts.exo2(
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            teamStatus == 'A'
-                                ? teamCargo.toUpperCase()
-                                : 'PENDENTE',
+                            isActive ? teamCargo.toUpperCase() : 'PENDENTE',
                             style: GoogleFonts.poppins(
-                                color: teamStatus == 'A'
-                                    ? Colors.white54
-                                    : Colors.orangeAccent,
+                                color: isActive
+                                    ? AppColors.textSecondary
+                                    : AppColors.pending,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
                     ),
-                    if (teamStatus == 'A')
+                    if (isActive)
                       IconButton(
                         icon: const Icon(Icons.exit_to_app,
-                            color: Colors.redAccent),
+                            color: AppColors.danger),
                         onPressed: () =>
                             _showLeaveTeamDialog(context, teamId, teamName),
                       ),
                   ],
                 ),
-                if (teamStatus != 'A') ...[
+                if (!isActive) ...[
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -264,7 +269,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               backgroundColor:
-                                  Colors.green.withValues(alpha: 0.8),
+                                  AppColors.success.withValues(alpha: 0.8),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8))),
                           onPressed: () async {
@@ -275,15 +280,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               _showError(e.toString());
                             }
                           },
-                          child: const Text("Aceitar",
-                              style: TextStyle(color: Colors.white)),
+                          child: Text("Aceitar",
+                              style: GoogleFonts.poppins(
+                                  color: AppColors.textPrimary)),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Colors.redAccent),
+                              side: const BorderSide(color: AppColors.danger),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8))),
                           onPressed: () async {
@@ -294,8 +300,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               _showError(e.toString());
                             }
                           },
-                          child: const Text("Recusar",
-                              style: TextStyle(color: Colors.redAccent)),
+                          child: Text("Recusar",
+                              style: GoogleFonts.poppins(
+                                  color: AppColors.danger)),
                         ),
                       ),
                     ],
@@ -314,23 +321,25 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1E1E2C),
+          backgroundColor: AppColors.surface,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text('Sair do Time',
-              style: GoogleFonts.exo2(color: Colors.white)),
+              style: GoogleFonts.exo2(color: AppColors.textPrimary)),
           content: Text('Tem certeza que deseja sair de "$teamName"?',
-              style: GoogleFonts.poppins(color: Colors.white70)),
+              style:
+                  GoogleFonts.poppins(color: AppColors.textPrimary.withValues(alpha: 0.7))),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancelar',
-                  style: TextStyle(color: Colors.white54)),
+              child: Text('Cancelar',
+                  style: TextStyle(
+                      color: AppColors.textPrimary.withValues(alpha: 0.54))),
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             TextButton(
-              child: const Text('SAIR',
-                  style: TextStyle(
-                      color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              child: Text('SAIR',
+                  style: GoogleFonts.exo2(
+                      color: AppColors.danger, fontWeight: FontWeight.bold)),
               onPressed: () async {
                 final userId = await AuthStorage.getUserId();
                 if (userId == null) return;
