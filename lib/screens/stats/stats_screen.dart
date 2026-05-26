@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:erank_app/models/player_card.dart';
 import 'package:erank_app/services/estatisticas_service.dart';
 import 'package:erank_app/widgets/player_card_widget.dart';
@@ -34,7 +35,7 @@ class _StatsScreenState extends State<StatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0C29),
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           Positioned.fill(
@@ -74,14 +75,14 @@ class _StatsScreenState extends State<StatsScreen> {
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color:
-                                const Color(0xFF1E1E2C).withValues(alpha: 0.8),
+                                AppColors.surface.withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.white10),
+                            border: Border.all(color: AppColors.borderSubtle),
                           ),
                           child: Center(
                             child: Text("Nenhuma partida recente.",
-                                style:
-                                    GoogleFonts.poppins(color: Colors.white54)),
+                                style: GoogleFonts.poppins(
+                                    color: AppColors.textSecondary)),
                           ),
                         )
                       ],

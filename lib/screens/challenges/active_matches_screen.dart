@@ -36,7 +36,7 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0C29),
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           Positioned.fill(
@@ -44,7 +44,7 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
               'assets/background_neon.png',
               fit: BoxFit.cover,
               errorBuilder: (ctx, err, stack) =>
-                  Container(color: const Color(0xFF0F0C29)),
+                  Container(color: AppColors.background),
             ),
           ),
           Scaffold(
@@ -86,9 +86,9 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E2C).withValues(alpha: 0.8),
+                        color: AppColors.surface.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white10),
+                        border: Border.all(color: AppColors.borderSubtle),
                       ),
                       child: ListTile(
                         title: Text(
@@ -106,19 +106,20 @@ class _ActiveMatchesScreenState extends State<ActiveMatchesScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.orange),
+                                  border: Border.all(color: AppColors.pending),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   'Aguardando\nOponente',
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.poppins(
-                                      color: Colors.orange, fontSize: 10),
+                                      color: AppColors.pending, fontSize: 10),
                                 ),
                               )
                             : ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary),
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: AppColors.textPrimary),
                                 onPressed: () async {
                                   await Navigator.push(
                                     context,

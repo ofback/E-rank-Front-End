@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:erank_app/models/ranking_dto.dart';
 import 'package:erank_app/services/ranking_service.dart';
+import 'package:erank_app/core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RankingScreen extends StatefulWidget {
@@ -34,20 +35,17 @@ class _RankingScreenState extends State<RankingScreen>
   }
 
   void _handleTabSelection() {
-    if (_tabController.indexIsChanging) {
-      return;
-    }
+    if (_tabController.indexIsChanging) return;
     final novo = _tabController.index == 0 ? 'GLOBAL' : 'AMIGOS';
     if (_currentTipo != novo) {
       setState(() {
         _currentTipo = novo;
-        _resetList(); // Reset list here as well
+        _resetList();
       });
       _loadRanking();
     }
   }
 
-  // Método adicionado para corrigir o erro 'undefined_method'
   void _resetList() {
     _players = [];
     _currentPage = 0;
@@ -56,35 +54,34 @@ class _RankingScreenState extends State<RankingScreen>
   }
 
   Future<void> _loadRanking() async {
-    if (!_hasMore && _currentPage > 0) {
-      return;
-    }
+    if (!_hasMore && _currentPage > 0) return;
     setState(() => _isLoading = true);
     try {
       final newPlayers =
           await _service.getRanking(page: _currentPage, tipo: _currentTipo);
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       setState(() {
-        if (newPlayers.length < 20) {
-          _hasMore = false;
-        }
+        if (newPlayers.length < 20) _hasMore = false;
         _players.addAll(newPlayers);
         _currentPage++;
         _isLoading = false;
       });
     } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Color _rankColor(int posicao) {
+    if (posicao == 1) return AppColors.gold;
+    if (posicao == 2) return AppColors.silver;
+    if (posicao == 3) return AppColors.bronze;
+    return Colors.transparent;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0C29),
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           Positioned.fill(
@@ -92,22 +89,22 @@ class _RankingScreenState extends State<RankingScreen>
               'assets/background_neon.png',
               fit: BoxFit.cover,
               errorBuilder: (ctx, err, stack) =>
-                  Container(color: const Color(0xFF0F0C29)),
+                  Container(color: AppColors.background),
             ),
           ),
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               title: Text('RANKING',
-                  style: GoogleFonts.bevan(color: Colors.white)),
+                  style: GoogleFonts.bevan(color: AppColors.textPrimary)),
               backgroundColor: Colors.transparent,
               elevation: 0,
-              iconTheme: const IconThemeData(color: Colors.white),
+              iconTheme: const IconThemeData(color: AppColors.textPrimary),
               bottom: TabBar(
                 controller: _tabController,
-                indicatorColor: Colors.blueAccent,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white60,
+                indicatorColor: AppColors.primary,
+                labelColor: AppColors.textPrimary,
+                unselectedLabelColor: AppColors.textSecondary,
                 labelStyle: GoogleFonts.exo2(fontWeight: FontWeight.bold),
                 tabs: const [
                   Tab(text: 'GLOBAL', icon: Icon(Icons.public)),
@@ -126,8 +123,8 @@ class _RankingScreenState extends State<RankingScreen>
                 return false;
               },
               child: RefreshIndicator(
-                color: Colors.blueAccent,
-                backgroundColor: const Color(0xFF1E1E2C),
+                color: AppColors.primary,
+                backgroundColor: AppColors.surface,
                 onRefresh: () async {
                   _resetList();
                   await _loadRanking();
@@ -138,7 +135,8 @@ class _RankingScreenState extends State<RankingScreen>
                         ? Center(
                             child: Text(
                               "Nenhum jogador encontrado no ranking.",
-                              style: GoogleFonts.poppins(color: Colors.white54),
+                              style: GoogleFonts.poppins(
+                                  color: AppColors.textSecondary),
                             ),
                           )
                         : ListView.builder(
@@ -155,26 +153,20 @@ class _RankingScreenState extends State<RankingScreen>
 
                               final player = _players[index];
                               final posicao = index + 1;
-
-                              Color? rankColor;
-                              if (posicao == 1) {
-                                rankColor = Colors.amber;
-                              } else if (posicao == 2) {
-                                rankColor = Colors.grey[300];
-                              } else if (posicao == 3) {
-                                rankColor = Colors.orange[300];
-                              }
+                              final rColor = _rankColor(posicao);
+                              final hasMedal = posicao <= 3;
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 12),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF1E1E2C)
+                                  color: AppColors.surface
                                       .withValues(alpha: 0.8),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: rankColor?.withValues(alpha: 0.5) ??
-                                        Colors.white10,
-                                    width: rankColor != null ? 1.5 : 1,
+                                    color: hasMedal
+                                        ? rColor.withValues(alpha: 0.5)
+                                        : AppColors.borderSubtle,
+                                    width: hasMedal ? 1.5 : 1,
                                   ),
                                 ),
                                 child: ListTile(
@@ -185,13 +177,15 @@ class _RankingScreenState extends State<RankingScreen>
                                     height: 40,
                                     alignment: Alignment.center,
                                     decoration: BoxDecoration(
-                                      color: rankColor ?? Colors.white10,
+                                      color: hasMedal
+                                          ? rColor
+                                          : AppColors.surfaceLight,
                                       shape: BoxShape.circle,
-                                      boxShadow: rankColor != null
+                                      boxShadow: hasMedal
                                           ? [
                                               BoxShadow(
-                                                  color: rankColor.withValues(
-                                                      alpha: 0.6),
+                                                  color: rColor
+                                                      .withValues(alpha: 0.6),
                                                   blurRadius: 10)
                                             ]
                                           : null,
@@ -199,17 +193,17 @@ class _RankingScreenState extends State<RankingScreen>
                                     child: Text(
                                       '#$posicao',
                                       style: GoogleFonts.bevan(
-                                        color: rankColor != null
-                                            ? Colors.black
-                                            : Colors.white,
-                                        fontSize: 16,
+                                        color: hasMedal
+                                            ? AppColors.background
+                                            : AppColors.textPrimary,
+                                        fontSize: 15,
                                       ),
                                     ),
                                   ),
                                   title: Text(
                                     player.nickname,
                                     style: GoogleFonts.exo2(
-                                      color: Colors.white,
+                                      color: AppColors.textPrimary,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                     ),
@@ -217,7 +211,8 @@ class _RankingScreenState extends State<RankingScreen>
                                   subtitle: Text(
                                     'V: ${player.vitorias} | K: ${player.kills}',
                                     style: GoogleFonts.poppins(
-                                        color: Colors.white54, fontSize: 12),
+                                        color: AppColors.textSecondary,
+                                        fontSize: 12),
                                   ),
                                   trailing: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -228,14 +223,14 @@ class _RankingScreenState extends State<RankingScreen>
                                         '${player.pontuacao}',
                                         style: GoogleFonts.bevan(
                                           fontSize: 18,
-                                          color: Colors.blueAccent,
+                                          color: AppColors.info,
                                         ),
                                       ),
                                       Text(
                                         'PTS',
                                         style: GoogleFonts.exo2(
                                             fontSize: 10,
-                                            color: Colors.white38),
+                                            color: AppColors.textDisabled),
                                       ),
                                     ],
                                   ),
