@@ -1,9 +1,5 @@
 import 'package:erank_app/core/theme/app_colors.dart';
-import 'package:erank_app/screens/challenges/active_matches_screen.dart';
-import 'package:erank_app/screens/challenges/challenges_list_screen.dart';
 import 'package:erank_app/screens/challenges/create_challenge_screen.dart';
-import 'package:erank_app/screens/ranking/ranking_screen.dart';
-import 'package:erank_app/screens/stats/stats_screen.dart';
 import 'package:erank_app/screens/teams/team_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:erank_app/services/team_service.dart';
@@ -58,37 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        actions: [
-          _buildActionButton(Icons.emoji_events, AppColors.gold, 'Ranking', () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const RankingScreen()));
-          }),
-          _buildActionButton(
-              Icons.sports_kabaddi, AppColors.info, 'Desafios', () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const ChallengesListScreen()));
-          }),
-          _buildActionButton(
-              Icons.sports_esports, AppColors.accent, 'Partidas', () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const ActiveMatchesScreen()));
-          }),
-          _buildActionButton(
-              Icons.bar_chart, AppColors.primary, 'Stats', () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const StatsScreen()));
-          }),
-          IconButton(
-            icon: Icon(Icons.logout,
-                color: AppColors.textPrimary.withValues(alpha: 0.54)),
-            tooltip: 'Sair',
-            onPressed: () async {
-              await AuthStorage.logout();
-            },
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,14 +126,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildActionButton(
-      IconData icon, Color color, String tooltip, VoidCallback onTap) {
-    return IconButton(
-      icon: Icon(icon, color: color),
-      tooltip: tooltip,
-      onPressed: onTap,
-    );
-  }
 
   Widget _buildTeamCard(dynamic team) {
     final int teamId = team['id'] ?? 0;
